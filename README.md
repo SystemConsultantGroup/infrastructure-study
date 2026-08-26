@@ -39,6 +39,14 @@ Every preparation group should be ready to address four questions:
 
 Groups should clearly distinguish documented facts, experimental observations, and their own inferences. Shared references should prefer official documentation, standards, source code, and this study's target repositories.
 
-## Tooling status
+## Tooling
 
-A small cross-platform Nix Flake will be added after the curriculum and topic documents are accepted. It will target x86_64 and aarch64 on Linux and macOS; macOS support is intended primarily to demonstrate evaluation and environment portability.
+Enter the study environment with:
+
+```sh
+nix develop
+```
+
+The Flake provides the small common toolset used across the sessions: DNS, HTTP/TLS, container, Kubernetes, Cilium, Talos/QEMU, GitHub, YAML, throughput, and packet-inspection clients. Linux additionally receives the Linux-specific networking and tracing tools used by the low-level sessions.
+
+Supported systems are x86_64 and aarch64 Linux plus aarch64 macOS. macOS support primarily demonstrates that the environment evaluates and remains portable; operating-system-specific exercises may still require Linux. The Flake follows the `nixpkgs-unstable` branch.

@@ -57,7 +57,7 @@ Do not turn this into a Nix language lesson.
 
 ### 4. Exercise the provided environment
 
-Once the study Flake is present, prepare a fresh-environment walkthrough:
+Using the study Flake, prepare a fresh-environment walkthrough:
 
 1. Set up Linux.
 2. Install Determinate Nix.
@@ -92,7 +92,7 @@ Include at least one setup failure and explain how to investigate it.
 
 - [Determinate Nix documentation](https://docs.determinate.systems/)
 - [NixOS Wiki: Flakes](https://wiki.nixos.org/wiki/Flakes)
-- The study repository's `flake.nix` and `flake.lock` once added
+- The study repository's `flake.nix` and `flake.lock`
 
 ## Minimum preparation
 
