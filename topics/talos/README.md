@@ -10,123 +10,82 @@
 
 ## 학습 목표
 
-Talos로 관리되는 Kubernetes node의 설계 철학과 lifecycle을 이해하고, 일회용 QEMU node를 `talosctl`로 관찰해 이론과 실제 동작을 연결합니다.
+Talos가 Kubernetes 노드를 운영하는 방식과 그 배경에 있는 설계 철학을 이해합니다. 일회용 QEMU 환경을 `talosctl`로 관찰해 개념과 실제 상태를 연결합니다.
 
-이론을 중심으로 하되 범위가 분명한 실습을 포함합니다. 운영 runbook을 작성하는 세션은 아닙니다.
+운영 절차를 외우기보다 Talos가 어떤 문제를 해결하고, 그 선택이 어떤 장점과 제약을 만드는지 설명하는 것이 목표입니다.
 
 ## 준비 방향
 
-Talos가 해결하려는 문제에서 출발해 운영 모델을 도출합니다. 하나의 node가 configuration을 받아 시작되고, 관찰되고, reboot되거나 종료되는 과정을 개념적으로 따라갑니다.
+머신 설정(machine configuration), API 중심 관리, 노드 생명주기를 하나의 운영 모델로 연결합니다. QEMU 실습은 이 모델을 확인하기 위한 작은 관찰 환경으로 사용하며, 구체적으로 무엇을 보여줄지는 준비팀이 선택합니다.
 
-QEMU 실습은 mental model을 눈으로 확인하기 위한 수단입니다. 전체 Kubernetes 클러스터 bootstrap, upgrade, recovery 실습으로 넓히지 않습니다. 이 저장소의 `k` interface는 GitOps (Advanced)에서 다룹니다.
+아래 질문은 조사 범위를 정하는 데 사용할 수 있는 출발점입니다.
 
-## 탐구 방향
+## 탐구 주제
 
-### 1. 문제와 설계 제약 찾기
+### 설계 철학과 장단점
 
-다음 질문을 조사합니다.
+- Talos는 일반적인 서버 운영에서 어떤 문제를 줄이려 하는가?
+- Kubernetes 노드에 특화된 운영체제라는 선택은 무엇을 가능하게 하는가?
+- 익숙한 접근 방식이나 관리 기능을 제한하면 보안과 운영성은 어떻게 달라지는가?
+- Talos를 사용해도 플랫폼 운영자에게 남는 책임은 무엇인가?
 
-- Talos는 node drift와 운영 불확실성 가운데 어떤 문제를 해결하려 하는가?
-- Kubernetes node의 역할에 대해 어떤 전제를 두고 있는가?
-- 일반적인 서버 관리 방식과 access model은 어떻게 다른가?
-- 어떤 관리 기능을 의도적으로 없애거나 제한했는가?
-- 그 선택이 security와 operability에 미치는 영향은 무엇인가?
+### 머신 설정과 상태
 
-기능을 나열하는 데 그치지 말고, 설계가 만드는 trade-off를 함께 설명합니다.
+- 원하는 머신 상태는 어떻게 표현되는가?
+- 머신별 설정, 클러스터 공통 설정, 파생된 상태는 어떻게 구분되는가?
+- 선언한 설정과 실제 관찰된 상태가 다를 때 무엇을 확인해야 하는가?
+- 변경의 종류에 따라 적용 방식이나 생명주기 전환이 달라지는 이유는 무엇인가?
 
-### 2. Machine state model 만들기
+### API와 노드 생명주기
 
-다음 내용을 탐구합니다.
+- 노드는 처음 시작한 뒤 어떤 상태를 거쳐 Kubernetes에 참여하는가?
+- `talosctl`은 어떤 신뢰와 권한을 바탕으로 노드를 관리하는가?
+- Kubernetes API를 사용할 수 없는 상황에서도 무엇을 관찰할 수 있는가?
+- 부팅, 정상 운영, 재부팅, 종료, 유지보수, 복구를 어떤 상태 전환으로 이해할 수 있는가?
 
-- 원하는 machine state는 어떻게 표현되는가?
-- 어떤 configuration이 machine별, cluster 공통, 또는 파생된 값인가?
-- Node는 configuration을 어떻게 받고 검증하는가?
-- 실행 중 적용할 수 있는 변경과 lifecycle 전환이 필요한 변경은 무엇인가?
-- Machine API 접근을 위한 secret과 trust는 어떻게 형성되는가?
-- Operator는 선언한 configuration과 실제 관찰된 상태를 어떻게 구분해야 하는가?
+### QEMU에서 관찰하기
 
-개념 모델을 먼저 세운 뒤 대표 구성 하나를 예시로 사용합니다.
+공식 문서를 바탕으로 일회용 Talos 환경을 준비하고, 앞에서 만든 모델 가운데 일부를 확인합니다. 예를 들어 머신 상태, 서비스, 로그, 실제 적용된 설정, 재부팅 전후의 변화 등을 선택할 수 있습니다.
 
-### 3. Node lifecycle 따라가기
+호스트 운영체제와 CPU 아키텍처에 따라 QEMU 실행 조건이 다를 수 있으므로, 시연 환경과 대체 방법을 미리 확인합니다. 운영 환경의 인증 정보나 설정은 사용하지 않습니다.
 
-다음 단계를 포함하는 high-level lifecycle을 구성합니다.
+### 운영 모델 평가
 
-- 최초 boot
-- Configuration 확보
-- Service 시작
-- Kubernetes cluster 참여
-- 정상 상태 관찰
-- 구성 변경
-- Reboot 또는 shutdown
-- Maintenance 및 recovery state
-
-각 단계에서 어떤 증거를 관찰할 수 있는지, Kubernetes 자체가 동작하지 않을 때도 사용할 수 있는 control interface는 무엇인지 질문합니다.
-
-세부 etcd 내부 구조와 production recovery 절차는 범위에서 제외합니다.
-
-### 4. QEMU 실습 준비하기
-
-최신 Talos 공식 QEMU 가이드를 이용해 일회용 환경을 만듭니다. 이론을 확인하는 데 필요한 범위만 실습합니다.
-
-1. QEMU에서 Talos node 또는 최소 local environment를 시작합니다.
-2. `talosctl` access를 설정합니다.
-3. Machine state와 service를 확인합니다.
-4. Log와 effective configuration을 살펴봅니다.
-5. 관찰한 상태를 앞에서 만든 lifecycle과 연결합니다.
-6. Node를 reboot하거나 종료한 뒤 상태 전환을 관찰합니다.
-7. 실습 환경을 정리합니다.
-
-준비 과정에서 다음을 확인합니다.
-
-- 호스트 아키텍처와 acceleration 요구 사항
-- 필요한 권한 및 networking 지원
-- Linux와 macOS QEMU host 사이의 차이
-- 세션 중 virtualization을 사용할 수 없을 때의 대체 시연 방법
-
-Production credential이나 configuration은 사용하지 않습니다.
-
-### 5. 운영 모델 평가하기
-
-마지막으로 다음을 논의합니다.
-
-- 어떤 종류의 운영 실수를 방지하기 쉬워지는가?
-- 익숙한 debugging 방식 가운데 사용할 수 없게 되는 것은 무엇인가?
-- 그 자리를 어떤 evidence와 workflow가 대신하는가?
-- 어떤 장애는 repair, reconfiguration, replacement 가운데 무엇이 필요한가?
-- 이 모델은 declarative infrastructure 철학에 어떤 장점과 제약을 주는가?
+- Talos를 통해 줄일 수 있는 상태 불일치와 운영 실수는 무엇인가?
+- 기존의 디버깅 방법을 사용할 수 없다면 어떤 근거와 관찰 수단이 이를 대신하는가?
+- 복구, 재설정, 교체 가운데 무엇을 선택할지 어떤 기준으로 판단할 수 있는가?
+- 이 운영 모델은 선언적 인프라와 어떤 점에서 잘 맞거나 충돌하는가?
 
 ## 범위
 
-### 반드시 다룰 내용
+### 핵심 범위
 
-- Talos의 설계 목표와 trade-off
-- Desired state로서 머신 구성
-- 노드 boot와 lifecycle 개념
-- API access와 관찰 방식
-- 개념적인 maintenance 및 recovery state
-- 일회용 `talosctl`/QEMU 관찰 실습
+- Talos의 설계 목표와 장단점
+- 머신 설정과 원하는 상태
+- API 접근과 신뢰 모델
+- 노드 생명주기와 관찰 가능한 상태
+- 일회용 QEMU 환경에서의 `talosctl` 관찰
 
-### 다루지 않을 내용
+### 범위 밖
 
-- 이 저장소의 `k` 명령
-- SCG 저장소 전체 구조
-- 완전한 Kubernetes 클러스터 실습
-- 세부 etcd 내부 구조
-- Talos 또는 Kubernetes upgrade 절차
-- 파괴적인 recovery 실습
-- Production hardware별 절차
+- SCG 저장소의 `k` 명령
+- 완전한 Kubernetes 클러스터 구축 실습
+- 업그레이드 및 운영 환경 복구 절차
+- etcd 내부 구조
+- 운영 환경의 하드웨어별 절차
 
-## 시작 자료
+## 참고 자료
 
 - [Talos Linux 문서](https://docs.siderolabs.com/talos/)
 - [Talos QEMU platform guide](https://docs.siderolabs.com/talos/v1.13/platform-specific-installations/local-platforms/qemu)
 - [Talos support matrix](https://docs.siderolabs.com/talos/v1.13/getting-started/support-matrix)
-- [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)의 대표적인 `state.yaml`과 `patches/`: 일반적인 모델을 세운 뒤 사례로만 사용합니다.
+- [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)의 Talos 설정 예제
 
-링크된 version이 계속 최신이라고 가정하지 말고, 실습에서 선택한 Talos version에 맞는 문서를 사용합니다.
+링크의 버전이 항상 최신이라고 가정하지 말고, 선택한 Talos 버전에 맞는 문서를 사용합니다.
 
-## 최소 준비 사항
+## 준비 결과
 
-- Talos의 설계와 노드 lifecycle을 중심으로 세션을 진행합니다.
-- 일회용 QEMU 관찰 실습을 미리 준비하고 검증합니다.
-- 조사에 사용한 참고 자료를 공유합니다.
+- 위 목표를 다루는 120분 세션
+- 조사에 사용한 참고 자료
+
+QEMU에서 관찰할 상태와 세션 진행 방식은 준비팀이 결정합니다.

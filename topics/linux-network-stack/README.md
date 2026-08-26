@@ -10,131 +10,73 @@
 
 ## 학습 목표
 
-Linux kernel 안에서 TCP write와 read가 처리되는 lifecycle을 추적하고, 그 기반 위에서 Cilium을 사용하는 Kubernetes의 대표적인 통신 경로 하나를 조사합니다.
+Linux에서 TCP 데이터가 애플리케이션과 네트워크 장치 사이를 오가는 원리를 이해하고, 이 개념을 Cilium 기반 Kubernetes 통신에 적용합니다.
 
-어디에나 그대로 적용되는 packet-path 다이어그램을 암기하는 것이 목표가 아닙니다. Linux의 동작 원리, 실제 배포 설정, 공식 문서, 관찰 결과를 조합해 주어진 환경의 경로를 스스로 도출하는 방법을 익혀야 합니다.
+특정 다이어그램을 정답처럼 외우기보다 문서, 설정, 관찰 결과를 바탕으로 실제 환경의 경로를 추론하는 방법에 초점을 맞춥니다.
 
 ## 준비 방향
 
-한 프로세스가 쓴 byte가 다른 프로세스의 `read()`에 도달하는 과정을 세션 전체의 줄기로 삼습니다. Network namespace, Kubernetes, Cilium을 도입하기 전에 일반적인 Linux 경로부터 충분히 이해합니다.
+하나의 TCP 연결을 기준으로 송수신 흐름을 살펴보는 것을 권장하지만, 구체적인 애플리케이션과 Kubernetes 통신 유형은 준비팀이 선택합니다. 모든 커널 세부 사항을 다루기보다 선택한 경로를 설명하는 데 필요한 깊이를 판단합니다.
 
-이 차시는 kernel 동작을 깊게 다룹니다. 가능한 Kubernetes 통신 경로를 넓게 나열하기보다, 하나의 일관된 경로를 깊게 추적합니다.
+아래 질문은 탐구의 출발점이며, 준비팀은 관심과 시간에 맞게 묶거나 덜어낼 수 있습니다.
 
-## 탐구 방향
+## 탐구 주제
 
-### 1. 추적의 시작점과 끝점 정의하기
+### 애플리케이션과 커널의 경계
 
-구체적인 TCP 클라이언트와 서버를 정하고 다음을 확인합니다.
+- `write()`와 `read()`의 성공은 각각 무엇을 의미하는가?
+- 애플리케이션의 바이트 스트림은 커널 안에서 어떤 형태로 다뤄지는가?
+- 소켓 버퍼와 TCP 상태는 전송 과정에서 어떤 역할을 하는가?
+- 데이터가 지연되거나 유실될 수 있는 지점은 어디인가?
 
-- 어느 userspace call에서 추적을 시작하고 끝낼 것인가?
-- `write()`가 성공했다는 것은 정확히 무엇을 의미하는가?
-- `read()`가 성공했다는 것은 무엇을 의미하는가?
-- 어떤 상태가 userspace에 있고, 어떤 상태가 kernel space에 있는가?
-- 데이터는 어느 지점에서 복사되고, queue에 쌓이고, segment로 나뉘고, 지연되거나 유실될 수 있는가?
+### Linux 송수신 경로
 
-애플리케이션이 다루는 byte stream, TCP segment, IP packet, link-layer frame의 경계를 분명히 합니다.
+- 시스템 호출, TCP/IP 처리, 라우팅, 큐 처리, 네트워크 장치는 어떤 책임을 나누는가?
+- 송신 경로와 수신 경로는 어디에서 대칭적이고 어디에서 다른가?
+- 인터럽트, 폴링, NAPI, 오프로딩은 처리량과 지연에 어떤 영향을 줄 수 있는가?
+- 깊이 이해해야 할 구현과 추상화해도 되는 구현을 어떻게 구분할 것인가?
 
-### 2. 송신 경로 따라가기
+### 네임스페이스, eBPF, Cilium
 
-송신 프로세스에서 network device까지의 경로를 조사하고 다음 요소의 책임을 찾습니다.
+- 네트워크 네임스페이스와 가상 네트워크 장치가 추가되면 경로와 상태의 소유권은 어떻게 달라지는가?
+- Cilium은 Linux 네트워크 경로의 어느 지점에 개입할 수 있는가?
+- 서비스 선택, 정책 적용, 연결 상태는 어떤 방식으로 표현될 수 있는가?
+- 배포 설정에 따라 달라지는 경로를 확인하려면 어떤 근거가 필요한가?
 
-- Syscall과 소켓 계층
-- 소켓 send 버퍼
-- TCP state와 segmentation
-- IP routing과 출력 처리
-- 커널 내부 패킷 표현
-- Queueing discipline
-- 디바이스 및 driver 큐
-- Offload 기능
-- Physical 또는 virtual 디바이스 경계
+### Kubernetes 경로 도출
 
-정확한 mental model을 유지하기 위해 반드시 필요한 세부 사항과 추상화해도 되는 부분을 준비팀이 판단합니다.
+준비팀이 선택한 Cilium 기반 TCP 연결 하나에 일반 Linux 모델을 적용합니다.
 
-### 3. 수신 경로 따라가기
+- 어떤 부분은 일반 Linux 경로이고, 어떤 부분은 Kubernetes 또는 Cilium이 더하는가?
+- 네임스페이스, 장치, 라우팅, 정책의 경계는 어디에 있는가?
+- 확인한 사실, 관찰한 결과, 추론한 내용을 어떻게 구분할 것인가?
 
-네트워크에서 들어온 데이터가 수신 프로세스에 도달하는 방향으로 살펴봅니다.
+동일 노드, 노드 간, 외부 통신 가운데 무엇을 선택할지는 자유지만, 여러 경로를 얕게 나열하기보다 한 경로를 일관되게 설명하는 편이 좋습니다.
 
-- Kernel은 처리할 일이 생겼음을 어떻게 아는가?
-- Interrupt, polling, receive queue는 어디에서 등장하는가?
-- 해당 protocol과 socket은 어떻게 선택되는가?
-- 순서 정리와 acknowledgement는 어디에서 처리되는가?
-- Block된 프로세스는 어떻게 다시 실행 가능한 상태가 되는가?
-- Byte는 언제 `read()`가 읽을 수 있는 상태가 되는가?
+### 관찰 방법
 
-송신과 수신을 별개의 그림으로 끝내지 말고, 하나의 lifecycle로 연결합니다.
-
-### 4. Namespace와 virtual device 도입하기
-
-일반적인 경로를 세운 다음 다음을 조사합니다.
-
-- 프로세스가 network namespace 안에서 실행되면 무엇이 달라지는가?
-- 어떤 network state가 namespace에 속하는가?
-- Virtual device는 namespace와 host path를 어떻게 연결하는가?
-- TCP 처리 가운데 그대로 유지되는 부분은 무엇인가?
-- 어떤 라우팅 또는 forwarding 결정이 새로 추가되는가?
-
-모델을 검증하는 데 도움이 된다면 작은 namespace 실습을 준비할 수 있습니다. 다만 환경 구성 자체가 세션을 차지하지 않도록 합니다.
-
-### 5. Cilium이 개입하는 방식 조사하기
-
-Linux와 Cilium의 1차 자료를 이용해 다음을 알아봅니다.
-
-- Cilium은 어떤 Linux attachment point에서 connection에 개입할 수 있는가?
-- eBPF map에는 어떤 상태가 저장될 수 있는가?
-- Service 선택과 policy enforcement는 어떻게 표현될 수 있는가?
-- 기존 Linux networking mechanism 가운데 여전히 참여하는 것은 무엇인가?
-- Cluster configuration에 따라 달라지는 부분은 무엇이며, 이를 어떻게 확인할 수 있는가?
-
-일반적인 Cilium 다이어그램을 그대로 정답으로 삼지 않습니다. 특정 cluster의 실제 경로를 판단하려면 무엇을 확인하거나 관찰해야 하는지 명확히 제시합니다.
-
-### 6. Kubernetes 통신 경로 하나 도출하기
-
-Cilium 기반 Kubernetes에서 대표적인 TCP connection 하나를 선택하고 lifecycle을 도출합니다.
-
-- 송신 프로세스와 수신 프로세스를 식별합니다.
-- Namespace와 device 전환 지점을 나열합니다.
-- Routing, Service 선택, policy 결정 지점을 찾습니다.
-- 일반적인 Linux path를 그대로 따르는 부분을 구분합니다.
-- Kubernetes datapath가 추가하거나 바꾸는 부분을 구분합니다.
-- 확인된 사실, 직접 관찰한 결과, 추론한 내용을 분리합니다.
-
-핵심 세션에서 same-node, cross-node, external Gateway 경로를 모두 다루려 하지 않습니다.
-
-### 7. 관찰 가능한 모델 만들기
-
-특정 단계를 검증하는 데 도움이 되는 도구만 선택합니다. 예시는 다음과 같습니다.
-
-- `ss`
-- `tcpdump`
-- `bpftool`
-- Cilium observability 명령
-- 커널 tracing 기능
-
-각 관찰 결과가 어느 계층을 보여주며, 여전히 보이지 않는 부분은 무엇인지 함께 설명합니다.
+`ss`, `tcpdump`, `bpftool`, Cilium 관찰 기능, 커널 추적 기능 등에서 필요한 도구를 선택할 수 있습니다. 각 도구가 보여주는 계층과 보여주지 못하는 영역을 함께 설명합니다.
 
 ## 범위
 
-### 반드시 다룰 내용
+### 핵심 범위
 
-- Syscall과 소켓 버퍼
-- TCP 송수신 lifecycle
-- 커널 내부 패킷 표현
-- Routing과 queueing
-- NAPI, 디바이스 큐, 관련 offload 개념
-- Network namespace와 virtual device
-- eBPF attachment point
-- 직접 도출한 Cilium 기반 Kubernetes connection 하나
+- 시스템 호출과 소켓 버퍼
+- TCP 송수신 과정
+- 라우팅, 큐 처리, 네트워크 장치
+- 네트워크 네임스페이스와 가상 네트워크 장치
+- eBPF와 Cilium의 개입 지점
+- Cilium 기반 Kubernetes 연결 사례 하나
 
-### 다루지 않을 내용
+### 범위 밖
 
-- 모든 Cilium 배포 mode 비교
-- Same-node와 cross-node 경로의 전수 비교
-- Gateway 및 Envoy traffic path
-- 세부 congestion-control 알고리즘 비교
-- Netfilter의 역사
-- 일반적인 Cilium 설정 항목 설명
+- 가능한 모든 Kubernetes 통신 경로 비교
+- 모든 Cilium 배포 방식과 설정 항목 소개
+- Gateway 또는 Envoy 경로의 전수 분석
+- 커널 네트워킹 구현 전체
+- 혼잡 제어 알고리즘의 세부 비교
 
-## 시작 자료
+## 참고 자료
 
 - [Linux kernel networking 문서](https://docs.kernel.org/networking/)
 - [Linux kernel NAPI 문서](https://docs.kernel.org/networking/napi.html)
@@ -143,11 +85,11 @@ Cilium 기반 Kubernetes에서 대표적인 TCP connection 하나를 선택하�
 - [Cilium: Life of a Packet](https://docs.cilium.io/en/latest/network/ebpf/lifeofapacket/)
 - [BPF 문서](https://docs.kernel.org/bpf/)
 
-2차 자료의 다이어그램은 가설로 취급하고, 최신 1차 자료를 통해 검증합니다.
+2차 자료의 다이어그램은 가설로 활용하고, 가능한 경우 최신 1차 자료와 실제 환경을 통해 검토합니다.
 
-## 최소 준비 사항
+## 준비 결과
 
-- Kernel lifecycle과 Kubernetes 경로 연결을 중심으로 세션을 진행합니다.
-- 조사에 사용한 참고 자료를 공유합니다.
+- 위 목표를 다루는 120분 세션
+- 조사에 사용한 참고 자료
 
-이 주제는 다이어그램이나 trace가 특히 유용하지만, 실제로 어떤 자료를 만들지는 준비팀이 결정합니다.
+다이어그램, 추적 자료, 실습의 구성은 준비팀이 결정합니다.

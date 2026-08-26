@@ -10,147 +10,85 @@
 
 ## 학습 목표
 
-새 애플리케이션 저장소를 만들고 [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)에 연결하는 과정을 익힙니다. 이어서 Managed application이 배포되는 전체 lifecycle을 이해합니다.
+애플리케이션 저장소를 [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)의 관리형 배포 흐름에 연결하는 방법과 그 배경을 이해합니다.
 
-세션이 끝났을 때 참가자는 클러스터 또는 플랫폼 운영자 권한 없이도 정해진 절차에 따라 애플리케이션을 onboarding할 수 있어야 합니다.
+클러스터를 직접 변경하는 권한 없이도 애플리케이션을 등록하고 배포할 수 있는 이유를 소유권, 식별 정보, 신뢰의 관점에서 설명하는 것이 목표입니다.
 
 ## 준비 방향
 
-Managed application의 가장 기본적인 성공 경로 하나를 준비합니다. Production 배포는 처음부터 끝까지 추적하고, testing과 pull-request preview는 production과 달라지는 부분만 설명합니다.
+관리형 애플리케이션의 기본 경로를 중심으로 준비합니다. 운영 환경 배포의 전체 흐름을 살펴보고, 테스트 환경과 Pull Request 미리보기는 운영 환경과 다른 점을 필요한 범위에서 비교합니다.
 
-두 저장소와 여러 시스템을 연결해서 보되, 모든 workflow, ApplicationSet, Helm template의 내부 구현을 분석하는 세션으로 만들지는 않습니다. 핵심 철학은 ownership입니다. Source, build artifact, deployment intent, runtime state에 대한 권한이 각각 어느 저장소와 시스템에 있는지 구분합니다.
+저장소 문서를 출발점으로 삼되, 개별 워크플로나 템플릿을 줄마다 설명하지 않습니다. 사용할 예제와 시연 범위는 준비팀이 선택합니다.
 
-## 시작 자료
+## 탐구 주제
 
-Kubernetes 저장소의 다음 파일부터 살펴봅니다.
+### 두 저장소의 책임
 
-- `applications/README.en.md`
-- `applications/example/`
-- `.github/workflows/README.en.md`
-- `argocd/application-sets/README.en.md`
-- `argocd/charts/application/README.en.md`
+- 애플리케이션 저장소와 Kubernetes 저장소는 각각 어떤 상태를 소유하는가?
+- 소스, 빌드 산출물, 배포 의도, 실행 상태는 어디에 속하는가?
+- 한 저장소가 다른 저장소에 변경을 요청할 때 어떤 신뢰와 권한이 필요한가?
+- 실행 중인 클러스터 상태를 다시 Git의 기준 상태로 취급하지 않는 이유는 무엇인가?
 
-문서에서 workflow를 직접 도출하되, 적힌 내용을 그대로 옮기지 말고 GitOps model과 연결해 설명합니다.
+### 애플리케이션 저장소 준비
 
-## 탐구 방향
+- 관리형 배포 흐름에 참여하려면 애플리케이션 저장소가 어떤 계약을 만족해야 하는가?
+- 빌드와 배포 워크플로는 어떤 입력, 식별 정보, 권한을 다루는가?
+- 공통 워크플로를 사용할 때 애플리케이션 팀과 플랫폼 팀의 책임은 어떻게 나뉘는가?
+- 인증 정보나 신뢰할 수 없는 입력을 다룰 때 어떤 제약이 필요한가?
 
-### 1. 두 저장소 사이의 contract 정의하기
+작은 예제 저장소나 모의 환경을 사용할 수 있지만 필수는 아닙니다. 실제 운영 환경을 변경하거나 운영 인증 정보를 사용하지 않습니다.
 
-다음 질문을 조사합니다.
+### 관리형 애플리케이션 등록
 
-- 애플리케이션 저장소에는 무엇이 있어야 하는가?
-- Kubernetes 저장소에는 무엇이 있어야 하는가?
-- 어느 저장소가 delivery event를 시작하는가?
-- 어느 저장소가 deployment intent를 기록하는가?
-- 런타임 state를 source of truth로 다시 기록하지 않는 이유는 무엇인가?
-- 한 저장소가 다른 저장소에 변경을 요청할 수 있도록 허용하는 authorization은 무엇인가?
+- Kubernetes 저장소에서 애플리케이션의 배포 의도는 어떻게 표현되는가?
+- 애플리케이션, 이미지, 네임스페이스, Argo CD Application의 식별 정보는 어떻게 연결되는가?
+- 저장소가 제공하는 공통 추상화는 무엇을 표준화하는가?
+- 기본 경로를 벗어난 구성이 필요할 때 누가 어떤 책임을 가져야 하는가?
 
-개별 workflow를 살펴보기 전에 trust boundary부터 그립니다.
+### 배포 흐름 추적
 
-### 2. 최소 애플리케이션 저장소 준비하기
+운영 환경의 변경 하나를 골라 소스 변경부터 Kubernetes reconciliation까지의 경로를 직접 도출합니다.
 
-작은 예제 저장소를 만들거나 모의 환경을 구성하고 다음을 확인합니다.
+- 각 경계에서 어떤 이벤트와 산출물이 이동하는가?
+- 누가 변경을 만들고, 검증하고, 승인하고, 관찰하는가?
+- 변경되지 않는 소스 및 이미지 식별 정보는 어디에서 만들어지고 이어지는가?
+- 실패는 어느 저장소나 시스템에서 확인할 수 있는가?
 
-- 어떤 애플리케이션 artifact를 build할 수 있어야 하는가?
-- Dockerfile과 build context는 어디에 있어야 하는가?
-- Shared workflow는 어떻게 참조하고 version을 고정하는가?
-- 어떤 workflow event가 배포와 관련되는가?
-- 어떤 권한과 credential이 필요한가?
-- 어떤 값을 build input으로 안전하게 넘길 수 있는가?
-- Workflow 또는 image에 절대 포함하면 안 되는 정보는 무엇인가?
+정확한 순서와 구현은 저장소 문서와 실제 워크플로를 통해 확인합니다. 이 문서의 질문을 체크리스트처럼 모두 답할 필요는 없습니다.
 
-기존 production application을 변경하지 말고 일회용 예제를 사용합니다.
+### 환경별 차이와 설계 평가
 
-### 3. Managed application 등록하기
-
-Kubernetes 저장소의 managed layout을 살펴보며 다음을 조사합니다.
-
-- Application과 workload의 intent를 어떤 파일이 정의하는가?
-- Application metadata에는 어떤 정보가 들어가는가?
-- Instance lock에는 어떤 정보가 들어가는가?
-- 최초 production identity는 어떻게 만들어지는가?
-- Source identity와 이미지 identity는 어떻게 연결되는가?
-- 저장소, Argo CD, 네임스페이스, Kubernetes에 걸친 naming 제약은 무엇인가?
-- 이 contract는 어떤 validation으로 보호되는가?
-
-Custom Kustomize layout은 escape hatch로만 간단히 소개합니다. 어떤 상황에서 추가 조사가 필요한지 판단할 기준을 제시합니다.
-
-### 4. Production 배포 하나 추적하기
-
-Production 변경 하나를 골라 처음부터 끝까지 경로를 직접 그립니다. 다음 질문을 기준으로 각 단계를 찾아갑니다.
-
-- 애플리케이션 저장소에서는 어떤 event가 delivery를 시작하는가?
-- Build 결과물은 어디에서 만들어지며, source와 image의 identity는 어떻게 남는가?
-- 두 저장소 사이의 변경 요청은 어떻게 전달되고 검증되는가?
-- 각 저장소에서는 정확히 어떤 상태가 바뀌는가?
-- Kubernetes 저장소의 변경을 처음 관찰하는 시스템은 무엇인가?
-- Application 생성, Helm rendering, Kubernetes reconciliation은 각각 어느 지점에서 일어나는가?
-- 각 경계를 넘는 artifact는 무엇이며, 변경 권한은 누구에게 있는가?
-- 단계별 실패는 어디에서 확인할 수 있는가?
-
-정확한 event mapping과 workflow behavior는 이 문서에서 미리 알려주지 않습니다. 저장소 문서와 실제 workflow를 바탕으로 준비팀이 직접 도출해야 합니다.
-
-### 5. Testing과 preview의 차이 조사하기
-
-Production 흐름을 이해한 뒤 다음을 조사합니다.
-
-- 어떤 event가 testing 배포를 식별하는가?
-- 어떤 event가 preview를 식별하는가?
-- Preview identity는 어떻게 파생되는가?
-- Preview를 갱신하거나 닫으면 어떤 일이 생기는가?
-- Preview는 어떤 configuration 또는 service를 공유할 수 있는가?
-- Production과 다른 security assumption은 무엇인가?
-
-전체 production 흐름을 반복하지 말고 차이만 정리합니다.
-
-### 6. 리소스 생성 과정과 연결하기
-
-Kubernetes Part 2에서 배운 내용을 이용해 다음을 확인합니다.
-
-- 애플리케이션 선언은 어떻게 Argo CD Application이 되는가?
-- Shared values와 template은 어느 지점에 들어오는가?
-- 예제 workload를 위해 어떤 resource가 만들어지는가?
-- 생성된 identity는 애플리케이션 identity와 어떻게 연결되는가?
-
-ApplicationSet과 차트 template을 줄마다 분석하지는 않습니다.
-
-### 7. 설계 철학 평가하기
-
-마지막으로 다음 질문을 논의합니다.
-
-- 불변 source identity와 이미지 identity가 중요한 이유는 무엇인가?
-- Workflow가 cluster를 직접 바꾸지 않고 Git을 변경하는 이유는 무엇인가?
-- 애플리케이션 개발자에게 cluster credential이 필요하지 않은 이유는 무엇인가?
-- 신뢰할 수 없는 application event는 어떤 제약을 받는가?
-- 두 저장소에 걸쳐 어떤 audit trail이 남는가?
-- 이 속성을 얻는 대신 어떤 failure mode를 감수하는가?
+- 운영, 테스트, 미리보기 환경은 식별 정보와 생명주기에서 어떻게 다른가?
+- Git을 통한 변경이 직접 클러스터를 바꾸는 방식보다 어떤 장점과 비용을 가지는가?
+- 애플리케이션 개발자에게 클러스터 인증 정보를 주지 않는 구조는 어떤 신뢰 경계를 만드는가?
+- 두 저장소와 여러 시스템에 걸쳐 어떤 감사 기록이 남는가?
 
 ## 범위
 
-### 반드시 다룰 내용
+### 핵심 범위
 
-- Managed application 하나의 onboarding
-- 애플리케이션 저장소 구성
-- Shared workflow 연결
-- 저장소 간 authorization과 trust
-- 불변 source 및 이미지 identity
-- Kubernetes 저장소 최초 등록
-- Production lifecycle 전체
-- Testing과 preview의 차이
-- ApplicationSet과 Helm generation의 큰 흐름
+- 관리형 애플리케이션 등록 과정
+- 애플리케이션 저장소와 Kubernetes 저장소의 책임
+- 공통 워크플로와 저장소 사이의 신뢰
+- 소스 및 이미지 식별 정보
+- 운영 환경 배포의 전체 흐름
+- 테스트와 미리보기 환경의 주요 차이
 
-### 다루지 않을 내용
+### 범위 밖
 
-- Custom Kustomize onboarding 상세
-- Reusable workflow 내부 구현
-- Shared chart template 내부 구현
-- Argo CD 플랫폼 관리
-- 플랫폼 recovery
-- Production 자격 증명 또는 실제 production 변경
+- 별도 Kustomize 방식의 세부 구현
+- 공통 워크플로와 Helm 템플릿 내부 구현
+- Argo CD 플랫폼 운영
+- 운영 환경 변경, 인증 정보, 복구 절차
 
-## 최소 준비 사항
+## 참고 자료
 
-- Managed application onboarding과 lifecycle을 중심으로 세션을 진행합니다.
-- 조사에 사용한 참고 자료를 공유합니다.
+- [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)
+- 저장소의 애플리케이션 등록, 워크플로, Argo CD 구성에 관한 문서와 예제
 
-일회용 example repository나 충분히 설득력 있는 simulation을 준비하면 좋지만 필수는 아닙니다.
+## 준비 결과
+
+- 위 목표를 다루는 120분 세션
+- 조사에 사용한 참고 자료
+
+예제 저장소, 다이어그램, 모의 시연의 포함 여부는 준비팀이 결정합니다.
