@@ -34,12 +34,12 @@ Kubernetes 저장소의 다음 파일부터 살펴봅니다.
 
 ## 탐구 방향
 
-### 1. 두 저장소 사이의 계약 정의하기
+### 1. 두 저장소 사이의 contract 정의하기
 
 다음 질문을 조사합니다.
 
-- Application repository에는 무엇이 있어야 하는가?
-- Kubernetes repository에는 무엇이 있어야 하는가?
+- 애플리케이션 저장소에는 무엇이 있어야 하는가?
+- Kubernetes 저장소에는 무엇이 있어야 하는가?
 - 어느 저장소가 delivery event를 시작하는가?
 - 어느 저장소가 deployment intent를 기록하는가?
 - 런타임 state를 source of truth로 다시 기록하지 않는 이유는 무엇인가?
@@ -47,11 +47,11 @@ Kubernetes 저장소의 다음 파일부터 살펴봅니다.
 
 개별 workflow를 살펴보기 전에 trust boundary부터 그립니다.
 
-### 2. 최소 Application repository 준비하기
+### 2. 최소 애플리케이션 저장소 준비하기
 
 작은 예제 저장소를 만들거나 모의 환경을 구성하고 다음을 확인합니다.
 
-- 어떤 application artifact를 build할 수 있어야 하는가?
+- 어떤 애플리케이션 artifact를 build할 수 있어야 하는가?
 - Dockerfile과 build context는 어디에 있어야 하는가?
 - Shared workflow는 어떻게 참조하고 version을 고정하는가?
 - 어떤 workflow event가 배포와 관련되는가?
@@ -59,7 +59,7 @@ Kubernetes 저장소의 다음 파일부터 살펴봅니다.
 - 어떤 값을 build input으로 안전하게 넘길 수 있는가?
 - Workflow 또는 image에 절대 포함하면 안 되는 정보는 무엇인가?
 
-기존 production application을 변경하기보다 일회용 예제를 사용합니다.
+기존 production application을 변경하지 말고 일회용 예제를 사용합니다.
 
 ### 3. Managed application 등록하기
 
@@ -77,20 +77,18 @@ Custom Kustomize layout은 escape hatch로만 간단히 소개합니다. 어떤 
 
 ### 4. Production 배포 하나 추적하기
 
-Production 변경 하나를 처음부터 끝까지 따라갑니다.
+Production 변경 하나를 골라 처음부터 끝까지 경로를 직접 그립니다. 다음 질문을 기준으로 각 단계를 찾아갑니다.
 
-1. Application source가 변경됩니다.
-2. Application repository의 delivery workflow가 실행됩니다.
-3. Immutable build artifact와 source identity가 생성됩니다.
-4. 저장소 간 요청이 인증되고 검증됩니다.
-5. Kubernetes repository의 deployment intent가 변경됩니다.
-6. Argo CD가 새로운 상태를 관찰합니다.
-7. 애플리케이션 생성과 Helm rendering이 이루어집니다.
-8. Kubernetes가 생성된 resource를 reconcile합니다.
+- 애플리케이션 저장소에서는 어떤 event가 delivery를 시작하는가?
+- Build 결과물은 어디에서 만들어지며, source와 image의 identity는 어떻게 남는가?
+- 두 저장소 사이의 변경 요청은 어떻게 전달되고 검증되는가?
+- 각 저장소에서는 정확히 어떤 상태가 바뀌는가?
+- Kubernetes 저장소의 변경을 처음 관찰하는 시스템은 무엇인가?
+- Application 생성, Helm rendering, Kubernetes reconciliation은 각각 어느 지점에서 일어나는가?
+- 각 경계를 넘는 artifact는 무엇이며, 변경 권한은 누구에게 있는가?
+- 단계별 실패는 어디에서 확인할 수 있는가?
 
-각 전환에서 이동하는 아티팩트, 변경 권한을 가진 주체, identity, 가능한 실패를 식별합니다.
-
-정확한 이벤트 mapping과 워크플로 behavior는 커리큘럼에서 정답으로 받는 것이 아니라, 저장소 문서를 통해 준비팀이 직접 찾아야 합니다.
+정확한 event mapping과 workflow behavior는 이 문서에서 미리 알려주지 않습니다. 저장소 문서와 실제 workflow를 바탕으로 준비팀이 직접 도출해야 합니다.
 
 ### 5. Testing과 preview의 차이 조사하기
 
@@ -132,7 +130,7 @@ ApplicationSet과 차트 template을 줄마다 분석하지는 않습니다.
 ### 반드시 다룰 내용
 
 - Managed application 하나의 onboarding
-- Application repository 구성
+- 애플리케이션 저장소 구성
 - Shared workflow 연결
 - 저장소 간 authorization과 trust
 - 불변 source 및 이미지 identity
@@ -155,4 +153,4 @@ ApplicationSet과 차트 template을 줄마다 분석하지는 않습니다.
 - Managed application onboarding과 lifecycle을 중심으로 세션을 진행합니다.
 - 조사에 사용한 참고 자료를 공유합니다.
 
-일회용 example repository 또는 충분히 설득력 있는 simulation을 준비하면 좋지만 필수는 아닙니다.
+일회용 example repository나 충분히 설득력 있는 simulation을 준비하면 좋지만 필수는 아닙니다.

@@ -109,7 +109,7 @@ Congestion control은 TCP의 책임을 설명하는 데 필요한 수준까지�
 - 인터페이스, prefix, 이웃, 게이트웨이, 라우트
 - ICMP의 목적
 - 애플리케이션 관점의 TCP abstraction과 lifecycle
-- Timeout, refusal, reset의 차이
+- Timeout, connection refused, reset의 차이
 - 가설을 세운 뒤 `ip`와 `ping`으로 확인하는 과정
 
 ### 다루지 않을 내용

@@ -78,7 +78,7 @@ QEMU 실습은 mental model을 눈으로 확인하기 위한 수단입니다. �
 
 준비 과정에서 다음을 확인합니다.
 
-- 호스트 architecture와 acceleration 요구 사항
+- 호스트 아키텍처와 acceleration 요구 사항
 - 필요한 권한 및 networking 지원
 - Linux와 macOS QEMU host 사이의 차이
 - 세션 중 virtualization을 사용할 수 없을 때의 대체 시연 방법
@@ -119,7 +119,7 @@ Production credential이나 configuration은 사용하지 않습니다.
 ## 시작 자료
 
 - [Talos Linux 문서](https://docs.siderolabs.com/talos/)
-- [Talos QEMU 플랫폼 guide](https://docs.siderolabs.com/talos/v1.13/platform-specific-installations/local-platforms/qemu)
+- [Talos QEMU platform guide](https://docs.siderolabs.com/talos/v1.13/platform-specific-installations/local-platforms/qemu)
 - [Talos support matrix](https://docs.siderolabs.com/talos/v1.13/getting-started/support-matrix)
 - [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)의 대표적인 `state.yaml`과 `patches/`: 일반적인 모델을 세운 뒤 사례로만 사용합니다.
 

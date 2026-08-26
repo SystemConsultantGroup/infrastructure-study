@@ -107,7 +107,7 @@ Name만으로 identity를 완전히 표현할 수 없는 이유, label만으로 
 - 관리 중인 Pod를 삭제합니다.
 - 원하는 replica 수를 변경합니다.
 - Pod template을 변경합니다.
-- Readiness를 실패하게 만듭니다.
+- Readiness check가 실패하도록 만듭니다.
 - 같은 name으로 object를 다시 만듭니다.
 
 결과를 확인하기 전에 identity, ownership, 컨트롤러 책임을 근거로 어떤 일이 생길지 먼저 예측합니다.

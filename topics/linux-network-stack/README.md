@@ -32,7 +32,7 @@ Linux kernel 안에서 TCP write와 read가 처리되는 lifecycle을 추적하�
 - 어떤 상태가 userspace에 있고, 어떤 상태가 kernel space에 있는가?
 - 데이터는 어느 지점에서 복사되고, queue에 쌓이고, segment로 나뉘고, 지연되거나 유실될 수 있는가?
 
-Application byte, TCP segment, IP packet, link-layer frame의 경계를 분명히 합니다.
+애플리케이션이 다루는 byte stream, TCP segment, IP packet, link-layer frame의 경계를 분명히 합니다.
 
 ### 2. 송신 경로 따라가기
 
@@ -81,9 +81,9 @@ Linux와 Cilium의 1차 자료를 이용해 다음을 알아봅니다.
 
 - Cilium은 어떤 Linux attachment point에서 connection에 개입할 수 있는가?
 - eBPF map에는 어떤 상태가 저장될 수 있는가?
-- 서비스 선택과 정책 enforcement는 어떻게 표현될 수 있는가?
+- Service 선택과 policy enforcement는 어떻게 표현될 수 있는가?
 - 기존 Linux networking mechanism 가운데 여전히 참여하는 것은 무엇인가?
-- Cluster configuration에 따라 달라지는 부분은 무엇인가?
+- Cluster configuration에 따라 달라지는 부분은 무엇이며, 이를 어떻게 확인할 수 있는가?
 
 일반적인 Cilium 다이어그램을 그대로 정답으로 삼지 않습니다. 특정 cluster의 실제 경로를 판단하려면 무엇을 확인하거나 관찰해야 하는지 명확히 제시합니다.
 
@@ -93,7 +93,7 @@ Cilium 기반 Kubernetes에서 대표적인 TCP connection 하나를 선택하�
 
 - 송신 프로세스와 수신 프로세스를 식별합니다.
 - Namespace와 device 전환 지점을 나열합니다.
-- 라우팅, 서비스 선택, 정책 결정 지점을 찾습니다.
+- Routing, Service 선택, policy 결정 지점을 찾습니다.
 - 일반적인 Linux path를 그대로 따르는 부분을 구분합니다.
 - Kubernetes datapath가 추가하거나 바꾸는 부분을 구분합니다.
 - 확인된 사실, 직접 관찰한 결과, 추론한 내용을 분리합니다.
@@ -121,7 +121,7 @@ Cilium 기반 Kubernetes에서 대표적인 TCP connection 하나를 선택하�
 - 커널 내부 패킷 표현
 - Routing과 queueing
 - NAPI, 디바이스 큐, 관련 offload 개념
-- 네트워크 namespace와 virtual 디바이스
+- Network namespace와 virtual device
 - eBPF attachment point
 - 직접 도출한 Cilium 기반 Kubernetes connection 하나
 

@@ -43,6 +43,7 @@
               iptables
               iputils
               mtr
+              netcat-openbsd
               strace
             ];
           };
