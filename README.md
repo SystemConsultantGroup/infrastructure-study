@@ -16,17 +16,19 @@ Linux와 네트워크의 기초부터 Kubernetes와 플랫폼 운영까지, 현�
 
 ## 커리큘럼
 
-| 차시 | 제목 | 목적 | 내용 | 인원 배정 |
-| --- | --- | --- | --- | ---: |
-|  | [Introduction](topics/introduction/README.md) | 공통 Linux/Nix 환경을 구성하고, 재현 가능한 선언적 환경의 의미를 이해한다. | • Linux 환경 구성 및 Determinate Nix 설치<br>• Imperative 방식과 declarative 방식 비교<br>• 제공된 개발 환경의 구성 확인 및 진입<br>• 아무것도 준비되지 않은 환경에서 공통 셸까지 진입하는 과정 시연 | 2 |
-|  | [MAC / IP / TCP](topics/mac-ip-tcp/README.md) | 링크·네트워크·전송 계층을 따라 호스트 간 통신 과정을 설명할 수 있다. | • 계층화, 주소, 이웃, 라우팅, ICMP, TCP lifecycle 탐구<br>• `ip`와 `ping`으로 가설 검증<br>• 그 밖의 진단 도구는 선택 탐구 주제로 취급 | 2 |
-|  | [Linux Network Stack (Advanced)](topics/linux-network-stack/README.md) | Linux에서 TCP read/write가 처리되는 과정을 추적하고, 이를 Cilium 기반 Kubernetes까지 확장한다. | • Syscall, socket, TCP, kernel buffer, routing, queue, device, receive path 추적<br>• Network namespace와 eBPF가 개입하는 지점 탐구<br>• 설정을 미리 가정하지 않고 대표적인 Kubernetes 통신 경로 하나를 직접 도출 | 3 |
-|  | [HTTP / TLS / DNS](topics/http-tls-dns/README.md) | URL 입력부터 신뢰할 수 있는 HTTP 응답을 받기까지의 큰 흐름을 설명할 수 있다. | • 하나의 end-to-end 요청 흐름 구성<br>• DNS의 위임과 캐시, TLS의 신원과 신뢰, 애플리케이션 관점의 HTTP semantics 탐구<br>• 프로토콜 버전은 등장 배경과 해결하려던 문제를 중심으로 비교 | 2 |
-|  | [Kubernetes (Part 1)](topics/kubernetes-part-1/README.md) | Kubernetes를 선언적 control system으로 이해하고, 리소스의 identity와 ownership을 설명할 수 있다. | • Desired state, observed state, reconciliation 탐구<br>• Resource definition, name, UID, label, selector, owner reference 분석<br>• 하나의 애플리케이션 선언에서 controller가 파생하는 리소스와 관계 검증 | 3 |
-|  | [Talos (Advanced)](topics/talos/README.md) | Talos의 설계 철학과 API로 관리되는 Kubernetes node의 lifecycle을 이해한다. | • Talos의 운영 모델, machine configuration, bootstrap, 변경, 복구 개념 탐구<br>• 일회용 QEMU node와 `talosctl`로 이론 검증 | 2 |
-|  | [Kubernetes (Part 2)](topics/kubernetes-part-2/README.md) | Helm, Argo CD, Gateway API가 Kubernetes의 packaging, reconciliation, routing을 어떻게 확장하는지 이해한다. | • 하나의 애플리케이션을 Helm rendering, Argo CD reconciliation, Kubernetes resource, Gateway API routing 순으로 추적<br>• 각 시스템의 철학, 소유하는 상태, 책임 경계 구분 | 3 |
-|  | [GitOps](topics/gitops/README.md) | 애플리케이션 저장소를 만들고 SCG Kubernetes 배포 흐름에 연결할 수 있다. | • Managed application의 기본 경로를 저장소 구성부터 immutable image 생성, 저장소 간 변경, 배포 리소스 생성까지 추적<br>• Production은 전체 과정을 다루고 testing과 preview는 차이점 중심으로 정리 | 2 |
-|  | [GitOps (Advanced)](topics/gitops-advanced/README.md) | 플랫폼의 reconciliation 구조와 운영 모델을 이해하고 안전하게 판단할 수 있다. | • Root reconciliation 구조와 trust boundary 분석<br>• 검증 및 Secret 관리 방식 탐구<br>• `k` 작업의 위험도 분류<br>• 선언적 reconciliation과 불가피한 imperative 작업 구분<br>• 대표 장애 사례 분석 | 3 |
+각 제목은 해당 차시의 학습 목표와 준비 방향을 담은 상세 문서로 연결됩니다.
+
+| 차시 | 인원 | 제목 |
+| --- | ---: | --- |
+|  | 2명 | [Introduction](topics/introduction/README.md) |
+|  | 2명 | [MAC / IP / TCP](topics/mac-ip-tcp/README.md) |
+|  | 3명 | [Linux Network Stack (Advanced)](topics/linux-network-stack/README.md) |
+|  | 2명 | [HTTP / TLS / DNS](topics/http-tls-dns/README.md) |
+|  | 3명 | [Kubernetes (Part 1)](topics/kubernetes-part-1/README.md) |
+|  | 2명 | [Talos (Advanced)](topics/talos/README.md) |
+|  | 3명 | [Kubernetes (Part 2)](topics/kubernetes-part-2/README.md) |
+|  | 2명 | [GitOps](topics/gitops/README.md) |
+|  | 3명 | [GitOps (Advanced)](topics/gitops-advanced/README.md) |
 
 ## 준비 원칙
 
