@@ -1,52 +1,52 @@
-# 2026 Infrastructure Study Curriculum
+# 2026 인프라 스터디 커리큘럼
 
-A student-led study of the ideas behind modern infrastructure, progressing from Linux and networking fundamentals to Kubernetes and platform operations.
+Linux와 네트워크의 기초부터 Kubernetes와 플랫폼 운영까지, 현대 인프라를 이루는 기술의 **철학과 설계 배경**을 공부하는 학생 주도 스터디입니다.
 
-The central question in every session is not merely _how does this tool work?_, but _what problem does it solve, what philosophy shaped it, and what trade-offs follow from that philosophy?_
+모든 차시에서 가장 중요하게 다룰 질문은 단순히 “이 도구를 어떻게 사용하는가?”가 아닙니다. **어떤 문제를 해결하기 위해 등장했는가, 어떤 철학으로 설계되었는가, 그 선택으로 무엇을 얻고 무엇을 감수하는가**를 이해하는 것이 목표입니다.
 
-## Format
+## 진행 방식
 
-- Each topic is designed for a 120-minute session.
-- The students assigned to a topic research it and lead the session.
-- Non-advanced sessions target application developers.
-- Advanced sessions target platform engineers.
-- A prepared session and shared references are the only mandatory outputs. Slides, diagrams, exercises, and labs are left to each group.
-- The topic documents contain investigation vectors, not answers. Groups should derive conclusions from primary sources and experiments.
-- Repository-specific investigations use [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes).
+- 각 주제는 120분 진행을 기준으로 구성합니다.
+- 주제를 배정받은 학생이 직접 조사하고 스터디를 진행합니다.
+- 일반 주제는 애플리케이션 개발자에게 필요한 관점을 다룹니다.
+- Advanced 주제는 플랫폼 엔지니어에게 필요한 관점을 다룹니다.
+- 필수 결과물은 준비한 세션과 공유할 참고 자료뿐입니다. 슬라이드, 다이어그램, 실습, 과제 등을 만들지는 각 팀이 자유롭게 결정합니다.
+- 주제별 문서는 정답을 제공하지 않고, 조사를 시작할 방향과 질문을 제시합니다. 결론은 공식 문서와 직접 수행한 실험을 바탕으로 준비팀이 도출해야 합니다.
+- SCG 환경을 살펴볼 때는 [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes) 저장소를 기준으로 합니다.
 
-## Curriculum
+## 커리큘럼
 
 | 차시 | 제목 | 목적 | 내용 | 인원 배정 |
 | --- | --- | --- | --- | ---: |
-|  | [Introduction](topics/introduction/README.md) | Establish the common Linux/Nix environment and understand reproducible, declarative environments. | Set up Linux; install Determinate Nix; compare imperative and declarative setup; enter and inspect the provided study environment; demonstrate the path from a fresh environment to a working shell. | 2 |
-|  | [MAC / IP / TCP](topics/mac-ip-tcp/README.md) | Reason about host-to-host communication through the link, network, and transport layers. | Investigate layering, addressing, neighbours, routing, ICMP, and the TCP lifecycle; use `ip` and `ping` to test hypotheses; treat additional diagnostic tools as optional research. | 2 |
-|  | [Linux Network Stack (Advanced)](topics/linux-network-stack/README.md) | Trace a TCP read/write through Linux and extend the model to Cilium-backed Kubernetes. | Follow data through syscalls, sockets, TCP, kernel buffers, routing, queues, devices, and receive processing; investigate namespace and eBPF integration; derive one representative Kubernetes path without assuming its configuration. | 3 |
-|  | [HTTP / TLS / DNS](topics/http-tls-dns/README.md) | Explain the high-level journey from a URL to an authenticated HTTP response. | Build one end-to-end request flow; investigate DNS delegation and caching, TLS identity and trust, and application-relevant HTTP semantics; compare protocol versions only through their motivations. | 2 |
-|  | [Kubernetes (Part 1)](topics/kubernetes-part-1/README.md) | Understand Kubernetes as a declarative control system and reason about resource identity and ownership. | Study desired and observed state, reconciliation, resource definitions, names and UIDs, labels and selectors, owner references, and controller-derived resources; validate the model with one application. | 3 |
-|  | [Talos (Advanced)](topics/talos/README.md) | Understand Talos's design philosophy and the lifecycle of an API-managed Kubernetes node. | Investigate Talos's operating model, machine configuration, bootstrap, change, and recovery concepts; use a disposable QEMU node and `talosctl` to validate the theory. | 2 |
-|  | [Kubernetes (Part 2)](topics/kubernetes-part-2/README.md) | Understand how Helm, Argo CD, and Gateway API extend Kubernetes packaging, reconciliation, and routing. | Trace one application through Helm rendering, Argo CD reconciliation, Kubernetes resources, and Gateway API routing; identify each system's philosophy, state, and responsibility boundary. | 3 |
-|  | [GitOps](topics/gitops/README.md) | Set up an application repository and connect it to the SCG Kubernetes delivery workflow. | Follow the managed application path from repository setup and immutable image creation through cross-repository updates and deployment generation; cover production fully and summarize testing and preview behavior. | 2 |
-|  | [GitOps (Advanced)](topics/gitops-advanced/README.md) | Understand and safely reason about the platform's reconciliation and operational model. | Map the root reconciliation hierarchy and trust boundaries; investigate validation and secrets; classify `k` operations; distinguish declarative reconciliation from necessary imperative work; analyze representative incidents. | 3 |
+|  | [Introduction](topics/introduction/README.md) | 공통 Linux/Nix 환경을 구성하고, 재현 가능한 선언적 환경의 의미를 이해한다. | • Linux 환경 구성 및 Determinate Nix 설치<br>• Imperative 방식과 declarative 방식 비교<br>• 제공된 개발 환경의 구성 확인 및 진입<br>• 아무것도 준비되지 않은 환경에서 공통 셸까지 진입하는 과정 시연 | 2 |
+|  | [MAC / IP / TCP](topics/mac-ip-tcp/README.md) | 링크·네트워크·전송 계층을 따라 호스트 간 통신 과정을 설명할 수 있다. | • 계층화, 주소, 이웃, 라우팅, ICMP, TCP lifecycle 탐구<br>• `ip`와 `ping`으로 가설 검증<br>• 그 밖의 진단 도구는 선택 탐구 주제로 취급 | 2 |
+|  | [Linux Network Stack (Advanced)](topics/linux-network-stack/README.md) | Linux에서 TCP read/write가 처리되는 과정을 추적하고, 이를 Cilium 기반 Kubernetes까지 확장한다. | • Syscall, socket, TCP, kernel buffer, routing, queue, device, receive path 추적<br>• Network namespace와 eBPF가 개입하는 지점 탐구<br>• 설정을 미리 가정하지 않고 대표적인 Kubernetes 통신 경로 하나를 직접 도출 | 3 |
+|  | [HTTP / TLS / DNS](topics/http-tls-dns/README.md) | URL 입력부터 신뢰할 수 있는 HTTP 응답을 받기까지의 큰 흐름을 설명할 수 있다. | • 하나의 end-to-end 요청 흐름 구성<br>• DNS의 위임과 캐시, TLS의 신원과 신뢰, 애플리케이션 관점의 HTTP semantics 탐구<br>• 프로토콜 버전은 등장 배경과 해결하려던 문제를 중심으로 비교 | 2 |
+|  | [Kubernetes (Part 1)](topics/kubernetes-part-1/README.md) | Kubernetes를 선언적 control system으로 이해하고, 리소스의 identity와 ownership을 설명할 수 있다. | • Desired state, observed state, reconciliation 탐구<br>• Resource definition, name, UID, label, selector, owner reference 분석<br>• 하나의 애플리케이션 선언에서 controller가 파생하는 리소스와 관계 검증 | 3 |
+|  | [Talos (Advanced)](topics/talos/README.md) | Talos의 설계 철학과 API로 관리되는 Kubernetes node의 lifecycle을 이해한다. | • Talos의 운영 모델, machine configuration, bootstrap, 변경, 복구 개념 탐구<br>• 일회용 QEMU node와 `talosctl`로 이론 검증 | 2 |
+|  | [Kubernetes (Part 2)](topics/kubernetes-part-2/README.md) | Helm, Argo CD, Gateway API가 Kubernetes의 packaging, reconciliation, routing을 어떻게 확장하는지 이해한다. | • 하나의 애플리케이션을 Helm rendering, Argo CD reconciliation, Kubernetes resource, Gateway API routing 순으로 추적<br>• 각 시스템의 철학, 소유하는 상태, 책임 경계 구분 | 3 |
+|  | [GitOps](topics/gitops/README.md) | 애플리케이션 저장소를 만들고 SCG Kubernetes 배포 흐름에 연결할 수 있다. | • Managed application의 기본 경로를 저장소 구성부터 immutable image 생성, 저장소 간 변경, 배포 리소스 생성까지 추적<br>• Production은 전체 과정을 다루고 testing과 preview는 차이점 중심으로 정리 | 2 |
+|  | [GitOps (Advanced)](topics/gitops-advanced/README.md) | 플랫폼의 reconciliation 구조와 운영 모델을 이해하고 안전하게 판단할 수 있다. | • Root reconciliation 구조와 trust boundary 분석<br>• 검증 및 Secret 관리 방식 탐구<br>• `k` 작업의 위험도 분류<br>• 선언적 reconciliation과 불가피한 imperative 작업 구분<br>• 대표 장애 사례 분석 | 3 |
 
-## Preparation expectations
+## 준비 원칙
 
-Every preparation group should be ready to address four questions:
+모든 준비팀은 다음 네 가지 질문에 답할 수 있어야 합니다.
 
-1. What problem motivated this solution?
-2. What mental model best explains it?
-3. What trade-offs and responsibility boundaries does it create?
-4. How can the group validate its understanding rather than merely repeat documentation?
+1. 이 기술은 어떤 문제를 해결하기 위해 만들어졌는가?
+2. 이 기술을 가장 잘 설명하는 mental model은 무엇인가?
+3. 어떤 trade-off와 책임 경계를 만드는가?
+4. 문서를 그대로 옮기는 데 그치지 않고, 이해한 내용을 어떻게 검증할 수 있는가?
 
-Groups should clearly distinguish documented facts, experimental observations, and their own inferences. Shared references should prefer official documentation, standards, source code, and this study's target repositories.
+공식 문서에 적힌 사실, 실험에서 직접 관찰한 결과, 준비팀이 추론한 내용을 명확히 구분해야 합니다. 참고 자료는 공식 문서, 표준 문서, 소스 코드, 그리고 이 스터디에서 직접 다루는 저장소를 우선합니다.
 
-## Tooling
+## 개발 환경
 
-Enter the study environment with:
+다음 명령으로 스터디 개발 환경에 진입할 수 있습니다.
 
 ```sh
 nix develop
 ```
 
-The Flake provides the small common toolset used across the sessions: DNS, HTTP/TLS, container, Kubernetes, Cilium, Talos/QEMU, GitHub, YAML, throughput, and packet-inspection clients. Linux additionally receives the Linux-specific networking and tracing tools used by the low-level sessions.
+Flake에는 각 차시에서 사용할 수 있는 최소한의 공통 도구가 들어 있습니다. DNS, HTTP/TLS, container, Kubernetes, Cilium, Talos/QEMU, GitHub, YAML, 처리량 측정, 패킷 관찰 도구를 제공하며, Linux에서는 low-level 주제에 필요한 Linux 전용 networking 및 tracing 도구가 추가됩니다.
 
-Supported systems are x86_64 and aarch64 Linux plus aarch64 macOS. macOS support primarily demonstrates that the environment evaluates and remains portable; operating-system-specific exercises may still require Linux. The Flake follows the `nixpkgs-unstable` branch.
+지원 환경은 x86_64 Linux, aarch64 Linux, aarch64 macOS입니다. macOS 지원은 Flake가 정상적으로 평가되고 환경을 이식할 수 있음을 확인하는 데 주된 목적이 있습니다. 운영체제 기능에 의존하는 실습은 Linux가 필요할 수 있습니다. Flake는 `nixpkgs-unstable` 브랜치를 사용합니다.

@@ -1,102 +1,102 @@
 # Introduction
 
-[Back to the curriculum](../../README.md)
+[전체 커리큘럼으로 돌아가기](../../README.md)
 
-## Profile
+## 기본 정보
 
-- **Audience:** Everyone
-- **Leads:** 2
-- **Duration:** 120 minutes
+- **대상:** 전체
+- **담당 인원:** 2명
+- **시간:** 120분
 
-## Purpose
+## 학습 목표
 
-Establish a common Linux/Nix study environment and build the conceptual foundation for declarative, reproducible infrastructure.
+공통으로 사용할 Linux/Nix 환경을 구성하고, 선언적이고 재현 가능한 인프라가 무엇인지 이해하기 위한 기초를 마련합니다.
 
-By the end of the session, participants should be able to enter the provided environment from a fresh Linux setup and explain what the environment does—and does not—make reproducible.
+세션이 끝났을 때 참가자는 새 Linux 환경에서 제공된 개발 환경에 진입할 수 있어야 합니다. 또한 이 환경이 무엇을 재현 가능하게 만들며, 반대로 어떤 부분까지는 보장하지 못하는지 설명할 수 있어야 합니다.
 
-## Preparation brief
+## 준비 방향
 
-Prepare a lean setup session. Linux setup is part of the study, but general Linux administration and Nix implementation internals are not.
+환경 구성에 꼭 필요한 내용만 간결하게 준비합니다. Linux 환경을 만드는 과정 자체는 스터디에 포함하지만, 일반적인 Linux 시스템 관리나 Nix 내부 구현까지 확장하지는 않습니다.
 
-The practical thread should run from a fresh environment to a successful development shell. Use that journey to motivate the difference between remembered setup commands and declared environment state.
+아무것도 준비되지 않은 환경에서 공통 개발 셸에 진입하는 과정을 하나의 이야기로 구성합니다. 이 과정을 통해 기억에 의존하는 설치 명령과 코드로 선언한 환경의 차이를 자연스럽게 소개합니다.
 
-## Guiding vectors
+## 탐구 방향
 
-### 1. Establish the Linux baseline
+### 1. Linux 기준 환경 정하기
 
-Investigate and decide:
+다음 질문을 조사하고 준비팀의 기준을 정합니다.
 
-- What constitutes a sufficient Linux environment for the remaining sessions?
-- Which shell and filesystem concepts are essential to follow later demonstrations?
-- What assumptions does the study make about architecture, privileges, and network access?
-- Which setup differences between native Linux, a VM, and other host environments matter?
+- 이후 차시를 진행하기에 충분한 Linux 환경은 무엇인가?
+- 참가자가 알아야 할 최소한의 셸 및 파일 시스템 개념은 무엇인가?
+- CPU 아키텍처, 권한, 네트워크 접근에 대해 어떤 전제를 두는가?
+- Linux를 직접 사용하는 환경, VM, 기타 호스트 환경의 차이 가운데 실제 스터디에 영향을 주는 것은 무엇인가?
 
-Keep the baseline minimal. Introduce commands only when they are necessary for using the repository or diagnosing setup failures.
+저장소를 사용하거나 환경 문제를 진단하는 데 꼭 필요한 명령만 소개합니다. Linux 입문 강의로 범위를 넓히지 않습니다.
 
-### 2. Compare setup models
+### 2. 두 가지 환경 구성 방식 비교하기
 
-Construct a small comparison between imperative and declarative setup:
+작은 예시를 통해 imperative 방식과 declarative 방식을 비교합니다.
 
-- How would the required tools be installed and versioned manually?
-- Which parts of that process depend on memory, ordering, or machine history?
-- What can be expressed as desired state instead?
-- What kinds of reproducibility are possible, and where do host-level differences remain?
+- 필요한 도구를 수동으로 설치한다면 어떤 절차와 버전 관리가 필요한가?
+- 그 과정에서 작업자의 기억, 실행 순서, 기존 머신의 상태에 의존하는 부분은 무엇인가?
+- 그중 어떤 내용을 desired state로 표현할 수 있는가?
+- 재현 가능하다는 말은 정확히 무엇을 보장하며, 호스트 차이로 인해 남는 변수는 무엇인가?
 
-The point is to establish a mental model that will reappear in Kubernetes, Talos, and GitOps.
+여기서 세운 mental model은 이후 Kubernetes, Talos, GitOps에서 반복해서 사용합니다.
 
-### 3. Introduce Determinate Nix
+### 3. Determinate Nix 이해하기
 
-Research enough Nix to explain:
+다음 내용을 설명할 수 있을 만큼만 Nix를 조사합니다.
 
-- Why the study uses Nix for its tool environment.
-- What installing Determinate Nix changes on the host.
-- What a Flake contributes to environment discovery and version pinning.
-- What happens conceptually when a participant enters the development shell.
+- 이 스터디가 도구 환경을 Nix로 제공하는 이유는 무엇인가?
+- Determinate Nix를 설치하면 호스트에 어떤 변화가 생기는가?
+- Flake는 환경을 찾고 버전을 고정하는 데 어떤 역할을 하는가?
+- 개발 셸에 진입할 때 개념적으로 어떤 일이 일어나는가?
 
-Do not turn this into a Nix language lesson.
+Nix language 수업으로 이어지지 않도록 범위를 제한합니다.
 
-### 4. Exercise the provided environment
+### 4. 제공된 환경 사용하기
 
-Using the study Flake, prepare a fresh-environment walkthrough:
+스터디 Flake를 사용해 다음 과정을 처음부터 시연할 수 있도록 준비합니다.
 
-1. Set up Linux.
-2. Install Determinate Nix.
-3. Clone the study repository.
-4. Enter the development shell.
-5. Verify representative tools.
-6. Leave and re-enter the shell.
-7. Identify which state belongs to the host and which belongs to the repository.
+1. Linux 환경을 준비합니다.
+2. Determinate Nix를 설치합니다.
+3. 스터디 저장소를 clone합니다.
+4. 개발 셸에 진입합니다.
+5. 대표적인 도구가 사용 가능한지 확인합니다.
+6. 셸에서 나간 뒤 다시 진입합니다.
+7. 어떤 상태가 호스트에 속하고 어떤 상태가 저장소에 속하는지 구분합니다.
 
-Include at least one setup failure and explain how to investigate it.
+환경 구성 과정에서 발생할 수 있는 문제를 하나 이상 선정하고, 어떻게 원인을 좁혀갈지 설명합니다.
 
-## Scope boundaries
+## 범위
 
-### Keep
+### 반드시 다룰 내용
 
-- Linux environment setup
-- Essential shell and filesystem survival skills
-- Imperative versus declarative setup
-- Determinate Nix installation
-- Using the provided Flake
-- A fresh environment to development shell demonstration
+- Linux 환경 구성
+- 이후 차시에 필요한 최소한의 셸 및 파일 시스템 사용법
+- Imperative와 declarative 환경 구성의 차이
+- Determinate Nix 설치
+- 제공된 Flake 사용법
+- 새 환경에서 개발 셸까지 진입하는 시연
 
-### Leave out
+### 다루지 않을 내용
 
-- Nix language instruction
-- Derivations and Nix store internals
-- Flake authoring
-- General Linux system administration
-- A broad command-line tutorial
+- Nix language 문법
+- Derivation과 Nix store 내부 구조
+- Flake 작성법
+- 일반적인 Linux 시스템 관리
+- 광범위한 command-line 입문
 
-## Starting references
+## 시작 자료
 
-- [Determinate Nix documentation](https://docs.determinate.systems/)
+- [Determinate Nix 문서](https://docs.determinate.systems/)
 - [NixOS Wiki: Flakes](https://wiki.nixos.org/wiki/Flakes)
-- The study repository's `flake.nix` and `flake.lock`
+- 이 저장소의 `flake.nix`와 `flake.lock`
 
-## Minimum preparation
+## 최소 준비 사항
 
-- Lead the setup and philosophy discussion.
-- Share the references used.
+- 환경 구성 과정과 그 배경 철학을 중심으로 세션을 진행합니다.
+- 조사에 사용한 참고 자료를 공유합니다.
 
-Diagrams, setup notes, and troubleshooting exercises are encouraged but optional.
+다이어그램, 설치 문서, 문제 해결 실습을 추가할지는 준비팀이 결정합니다.

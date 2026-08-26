@@ -1,127 +1,127 @@
 # MAC / IP / TCP
 
-[Back to the curriculum](../../README.md)
+[전체 커리큘럼으로 돌아가기](../../README.md)
 
-## Profile
+## 기본 정보
 
-- **Audience:** Application developers
-- **Leads:** 2
-- **Duration:** 120 minutes
+- **대상:** 애플리케이션 개발자
+- **담당 인원:** 2명
+- **시간:** 120분
 
-## Purpose
+## 학습 목표
 
-Develop a theory-first model of host-to-host communication through the link, network, and transport layers.
+링크·네트워크·전송 계층을 따라 호스트 사이에서 통신이 이루어지는 과정을 이론 중심으로 이해합니다.
 
-By the end of the session, participants should be able to reason about where communication is failing and use `ip` and `ping` to test basic hypotheses. They should not need Kubernetes or container concepts to explain the path.
+세션이 끝났을 때 참가자는 통신이 어느 지점에서 실패했을지 논리적으로 추론하고, `ip`와 `ping`을 이용해 기본적인 가설을 검증할 수 있어야 합니다. 이 내용을 설명하는 데 container나 Kubernetes 지식이 필요하지 않아야 합니다.
 
-## Preparation brief
+## 준비 방향
 
-Use a small number of communication scenarios rather than presenting protocols independently. Begin with two hosts on the same network, introduce a routed destination, and finish with a TCP client and server.
+프로토콜을 하나씩 독립적으로 나열하기보다 몇 가지 작은 통신 시나리오를 이어서 설명합니다. 같은 네트워크에 있는 두 호스트에서 시작해, 라우터를 거쳐야 하는 목적지로 확장하고, 마지막에는 TCP 클라이언트와 서버의 통신을 살펴봅니다.
 
-Tools support the model; they are not the subject of the session.
+도구는 mental model을 확인하기 위한 수단일 뿐, 세션의 중심이 되어서는 안 됩니다.
 
-## Guiding vectors
+## 탐구 방향
 
-### 1. Explain why layers exist
+### 1. 네트워크가 계층으로 나뉜 이유
 
-Investigate:
+다음 질문을 탐구합니다.
 
-- Which problem is assigned to each layer?
-- Which identifiers are meaningful only on a local link, and which survive routing?
-- What does each layer assume the layer below already provides?
-- How does layering make independent evolution possible?
-- Where does the clean model differ from implementation reality?
+- 각 계층은 어떤 문제를 맡고 있는가?
+- 로컬 링크 안에서만 의미 있는 식별자와 라우터를 넘어 유지되는 식별자는 무엇인가?
+- 각 계층은 아래 계층이 무엇을 이미 제공한다고 가정하는가?
+- 계층화는 각 기술이 독립적으로 발전하는 데 어떻게 도움이 되는가?
+- 깔끔한 계층 모델과 실제 구현이 어긋나는 지점은 어디인가?
 
-### 2. Trace local communication
+### 2. 같은 네트워크 안에서 통신하기
 
-For two hosts on the same network, determine:
+같은 네트워크에 있는 두 호스트를 두고 다음을 파악합니다.
 
-- How the sender decides that the destination is local.
-- Which addresses are needed to transmit data.
-- How a network-layer destination becomes a link-layer next hop.
-- What state the operating system must already know or discover.
-- Which observations can be made with `ip`.
+- 송신자는 목적지가 같은 네트워크에 있다고 어떻게 판단하는가?
+- 실제로 데이터를 보내기 위해 어떤 주소들이 필요한가?
+- 네트워크 계층의 목적지는 링크 계층의 next hop으로 어떻게 이어지는가?
+- 운영체제가 미리 알고 있거나 새로 알아내야 하는 상태는 무엇인가?
+- `ip`를 통해 그 상태 가운데 무엇을 관찰할 수 있는가?
 
-Use the scenario to connect interfaces, addresses, prefixes, routes, and neighbours.
+이 시나리오를 이용해 interface, address, prefix, route, neighbour의 관계를 연결합니다.
 
-### 3. Introduce routing
+### 3. 라우팅 이해하기
 
-Extend the scenario to a destination outside the local network:
+로컬 네트워크 밖의 목적지를 추가하여 시나리오를 확장합니다.
 
-- How is a route selected?
-- What does the default gateway represent?
-- Which addresses change at each hop and which remain end to end?
-- What happens when a route is absent or incorrect?
-- What can a host know about the complete path?
+- 여러 라우트 중 하나는 어떻게 선택되는가?
+- Default gateway는 무엇을 의미하는가?
+- Hop을 지날 때마다 바뀌는 주소와 end-to-end로 유지되는 주소는 무엇인가?
+- 적절한 route가 없거나 route가 잘못되어 있다면 어떤 일이 생기는가?
+- 하나의 호스트가 전체 경로에 대해 알 수 있는 정보에는 어떤 한계가 있는가?
 
-Avoid turning subnet arithmetic into the main lesson; include only what is needed to reason about routing decisions.
+Subnet 계산은 라우팅 결정을 이해하는 데 필요한 정도만 다룹니다.
 
-### 4. Place ICMP in the model
+### 4. ICMP의 역할 찾기
 
-Investigate what ICMP contributes to IP networking:
+IP 네트워크에서 ICMP가 어떤 역할을 맡는지 조사합니다.
 
-- What question does `ping` actually ask?
-- Which conclusions can and cannot be drawn from a response or timeout?
-- How do latency, loss, policy, and an unavailable destination differ?
-- Why can an application fail even when `ping` succeeds?
-- Why can `ping` fail while an application still works?
+- `ping`은 정확히 어떤 질문을 보내는가?
+- 응답 또는 timeout으로 무엇을 결론 내릴 수 있고, 무엇은 알 수 없는가?
+- 지연, 패킷 손실, 정책 차단, 목적지 장애는 어떻게 다른가?
+- `ping`이 성공해도 애플리케이션이 실패할 수 있는 이유는 무엇인가?
+- 반대로 `ping`은 실패하지만 애플리케이션은 정상일 수 있는 이유는 무엇인가?
 
-Prepare experiments with explicit hypotheses rather than a list of command flags.
+명령 옵션을 나열하기보다 먼저 가설을 세우고 이를 검증하는 실험을 준비합니다.
 
-### 5. Build the TCP mental model
+### 5. TCP mental model 만들기
 
-Follow a TCP connection from the application's perspective:
+애플리케이션 관점에서 TCP connection을 따라갑니다.
 
-- What abstraction does TCP expose to an application?
-- How is a connection identified?
-- What needs to happen before application data can flow?
-- How are ordering, acknowledgement, retransmission, and flow control related?
-- What happens during an orderly close?
-- How should an application developer interpret timeout, refusal, and reset?
+- TCP는 애플리케이션에 어떤 abstraction을 제공하는가?
+- 하나의 connection은 무엇으로 식별되는가?
+- 애플리케이션 데이터가 흐르기 전에 무엇이 준비되어야 하는가?
+- 순서 보장, acknowledgement, retransmission, flow control은 어떻게 연결되는가?
+- 정상적으로 connection을 닫을 때 어떤 일이 일어나는가?
+- 애플리케이션 개발자는 timeout, connection refused, reset을 어떻게 해석해야 하는가?
 
-Cover congestion control only to the degree needed to understand TCP's responsibilities. Algorithm comparisons are outside the core scope.
+Congestion control은 TCP의 책임을 설명하는 데 필요한 수준까지만 다룹니다. 알고리즘별 비교는 핵심 범위에서 제외합니다.
 
-### 6. Optional tool-research vector
+### 6. 선택 탐구: 추가 도구
 
-If a preparation group member wants an additional practical vector, choose one or more tools and investigate their limits:
+준비팀이 실습 방향을 하나 더 맡고 싶다면 다음 도구 중 일부를 선택해 한계까지 함께 조사합니다.
 
-- `mtr` for path, latency, and loss over time
-- `hping3` for controlled ICMP or TCP probes
-- `iperf3` for throughput between controlled endpoints
-- `ss` for local socket state
-- `nc` for a minimal TCP client and server
+- 시간에 따른 경로, 지연, packet loss를 살펴보는 `mtr`
+- 의도한 ICMP 또는 TCP probe를 만드는 `hping3`
+- 통제된 두 endpoint 사이의 throughput을 측정하는 `iperf3`
+- 로컬 socket 상태를 확인하는 `ss`
+- 가장 단순한 TCP 클라이언트와 서버를 만드는 `nc`
 
-For each selected tool, answer:
+도구마다 다음을 답합니다.
 
-- What hypothesis can it test?
-- What prerequisites or privileges does it need?
-- What does its output not prove?
-- Does it clarify the core model enough to justify session time?
+- 어떤 가설을 검증할 수 있는가?
+- 어떤 환경이나 권한이 필요한가?
+- 출력만으로는 무엇을 증명할 수 없는가?
+- 핵심 mental model을 명확히 하는 데 세션 시간을 쓸 가치가 있는가?
 
-These tools are optional; `ip` and `ping` are the only required practical tools.
+이 도구들은 선택 사항입니다. 필수 실습 도구는 `ip`와 `ping`뿐입니다.
 
-## Scope boundaries
+## 범위
 
-### Keep
+### 반드시 다룰 내용
 
-- Layering and responsibility boundaries
-- MAC and IP relationships
-- Interfaces, prefixes, neighbours, gateways, and routes
-- ICMP's purpose
-- TCP's application-facing model and lifecycle
-- Timeout, refusal, and reset
-- Hypothesis-driven use of `ip` and `ping`
+- 계층화와 책임 경계
+- MAC과 IP의 관계
+- 인터페이스, prefix, 이웃, 게이트웨이, 라우트
+- ICMP의 목적
+- 애플리케이션 관점의 TCP abstraction과 lifecycle
+- Timeout, refusal, reset의 차이
+- 가설을 세운 뒤 `ip`와 `ping`으로 확인하는 과정
 
-### Leave out
+### 다루지 않을 내용
 
-- Containers and Kubernetes
-- Packet-capture analysis
-- Kernel packet-path internals
-- Packet-header memorization
-- Detailed congestion-control algorithms
-- A required throughput laboratory
+- Container와 Kubernetes
+- Packet capture 분석
+- Kernel 내부 packet path
+- Packet header 암기
+- 세부 congestion-control 알고리즘
+- 필수 처리량 실습
 
-## Starting references
+## 시작 자료
 
 - `man 8 ip`
 - `man 8 ping`
@@ -130,9 +130,9 @@ These tools are optional; `ip` and `ping` are the only required practical tools.
 - [RFC 8200: Internet Protocol, Version 6](https://www.rfc-editor.org/rfc/rfc8200)
 - [RFC 9293: Transmission Control Protocol](https://www.rfc-editor.org/rfc/rfc9293)
 
-The group may choose IPv4 for its concrete examples while noting where the mental model differs for IPv6.
+구체적인 예시는 IPv4로 통일해도 좋지만, IPv6에서는 mental model의 어느 부분이 달라지는지 짚어봅니다.
 
-## Minimum preparation
+## 최소 준비 사항
 
-- Lead the conceptual session and selected experiments.
-- Share the references used.
+- 핵심 개념과 선택한 실험을 중심으로 세션을 진행합니다.
+- 조사에 사용한 참고 자료를 공유합니다.

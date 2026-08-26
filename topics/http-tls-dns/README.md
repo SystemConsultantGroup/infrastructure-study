@@ -1,134 +1,134 @@
 # HTTP / TLS / DNS
 
-[Back to the curriculum](../../README.md)
+[전체 커리큘럼으로 돌아가기](../../README.md)
 
-## Profile
+## 기본 정보
 
-- **Audience:** Application developers
-- **Leads:** 2
-- **Duration:** 120 minutes
+- **대상:** 애플리케이션 개발자
+- **담당 인원:** 2명
+- **시간:** 120분
 
-## Purpose
+## 학습 목표
 
-Construct a high-level explanation of the journey from a URL to an authenticated HTTP response, with emphasis on protocol philosophy and application-relevant HTTP semantics.
+URL을 입력한 순간부터 신뢰할 수 있는 HTTP 응답을 받기까지의 큰 흐름을 하나로 연결해 설명합니다. 각 프로토콜의 설계 철학과 애플리케이션 개발자가 알아야 할 HTTP semantics에 집중합니다.
 
-Participants should finish with one connected model rather than three disconnected protocol summaries.
+세션이 끝났을 때 참가자는 DNS, TLS, HTTP를 따로 외운 상태가 아니라, 하나의 요청 안에서 세 프로토콜이 맡는 역할과 경계를 연결할 수 있어야 합니다.
 
-## Preparation brief
+## 준비 방향
 
-Choose a representative URL and follow it from the client to the application. Introduce DNS, TLS, and HTTP only when the request reaches the problem each protocol solves.
+대표 URL 하나를 정하고 클라이언트에서 애플리케이션까지 따라갑니다. 요청이 각 문제에 맞닥뜨리는 시점에 DNS, TLS, HTTP를 차례로 도입합니다.
 
-Keep the session theory-led. Tools may help confirm the sequence, but packet analysis and cryptographic implementation details are outside the intended scope.
+이론과 전체 흐름을 중심으로 준비합니다. 도구를 이용해 일부 단계를 확인할 수는 있지만, 패킷 분석이나 암호 알고리즘 구현은 범위에 포함하지 않습니다.
 
-## Guiding vectors
+## 탐구 방향
 
-### 1. Define the end-to-end request
+### 1. End-to-end 요청 흐름 정의하기
 
-Create a sequence containing at least:
+다음 요소를 포함하는 sequence를 구성합니다.
 
-- The client application
-- Local and recursive name resolution
+- 클라이언트 애플리케이션
+- 로컬 및 recursive name resolution
 - DNS authority
-- Transport establishment
+- Transport connection
 - TLS negotiation
-- An HTTP intermediary or gateway
-- The destination application
+- HTTP intermediary 또는 Gateway
+- 목적지 애플리케이션
 
-Investigate which steps are always required, which can be cached or reused, and which depend on protocol version or deployment design.
+항상 필요한 단계, 캐시하거나 재사용할 수 있는 단계, 프로토콜 버전 또는 배포 구조에 따라 달라지는 단계를 구분합니다.
 
-### 2. Investigate DNS as a naming system
+### 2. Naming system으로서의 DNS 이해하기
 
-Ask:
+다음 질문을 조사합니다.
 
-- Why is naming separate from addressing?
-- How is authority distributed and delegated?
-- What work belongs to recursive and authoritative participants?
-- What is cached, by whom, and for how long?
-- Which record types are needed for the chosen request?
-- How can stale or inconsistent answers arise?
-- Which failures belong to DNS rather than the application?
+- 이름과 주소를 별도로 관리하는 이유는 무엇인가?
+- Authority는 어떻게 분산되고 위임되는가?
+- Recursive resolver와 authoritative server는 각각 어떤 일을 하는가?
+- 어떤 정보가 어디에, 얼마나 오래 캐시되는가?
+- 선택한 요청에는 어떤 record가 필요한가?
+- 오래되거나 서로 다른 응답이 나타나는 이유는 무엇인가?
+- 어떤 실패를 애플리케이션이 아닌 DNS 문제로 보아야 하는가?
 
-Keep DNSSEC and resolver implementation internals outside the core session.
+DNSSEC과 resolver 내부 구현은 핵심 범위에서 제외합니다.
 
-### 3. Investigate TLS as a trust protocol
+### 3. Trust protocol로서의 TLS 이해하기
 
-Ask:
+다음 질문을 조사합니다.
 
-- What threats is TLS designed to address?
-- How does a client decide which identity it intends to reach?
-- How is that identity connected to a certificate and a chain of trust?
-- Which information must be negotiated before HTTP begins?
-- Why do SNI and ALPN exist?
-- What can terminate TLS, and how does termination change responsibility?
-- Which failures should be distinguished from transport and HTTP failures?
+- TLS는 어떤 위협을 막으려 하는가?
+- 클라이언트는 자신이 접속하려는 대상을 어떻게 식별하는가?
+- 그 identity는 certificate와 chain of trust에 어떻게 연결되는가?
+- HTTP를 시작하기 전에 무엇을 합의해야 하는가?
+- SNI와 ALPN은 왜 필요한가?
+- 어느 지점에서 TLS를 terminate할 수 있으며, termination 지점이 바뀌면 책임 경계는 어떻게 달라지는가?
+- Transport 또는 HTTP 오류와 구분해야 할 TLS 오류는 무엇인가?
 
-Explain cryptographic mechanisms only to the degree required to understand the guarantees and trust model.
+암호학적 동작은 보장하는 속성과 trust model을 이해하는 데 필요한 수준까지만 다룹니다.
 
-### 4. Investigate HTTP semantics
+### 4. HTTP semantics 탐구하기
 
-Prioritize concepts that affect application behavior:
+애플리케이션 동작에 직접 영향을 주는 개념을 우선합니다.
 
-- Methods and their intended semantics
-- Safety and idempotency
-- Status codes and redirects
-- Headers and representation metadata
-- Authentication versus authorization signals
-- Caching and validation
-- Cookies and browser state
-- CORS as a browser security mechanism
-- Forwarded information and proxy boundaries
+- Method가 표현하는 의도
+- Safety와 idempotency
+- Status code와 redirect
+- Header와 representation 메타데이터
+- Authentication과 authorization 신호의 차이
+- Cache와 검증
+- Cookie와 browser state
+- Browser security mechanism으로서의 CORS
+- Proxy를 거치며 전달되는 정보와 신뢰 경계
 
-Use examples to test whether an API or application behavior agrees with the protocol semantics.
+구체적인 사례를 통해 API 또는 애플리케이션의 동작이 HTTP semantics에 부합하는지 검토합니다.
 
-### 5. Place HTTP versions in context
+### 5. HTTP version을 등장 배경 중심으로 비교하기
 
-For HTTP/1.1, HTTP/2, and HTTP/3, investigate:
+HTTP/1.1, HTTP/2, HTTP/3에 대해 다음을 조사합니다.
 
-- Which limitations motivated the next version?
-- What changed in connection use and multiplexing?
-- Which application semantics remained stable?
-- Which differences should an application developer actually notice?
+- 다음 version이 해결하려 했던 한계는 무엇인가?
+- Connection 사용과 multiplexing 방식은 어떻게 달라졌는가?
+- Version이 바뀌어도 유지되는 application semantics는 무엇인가?
+- 애플리케이션 개발자가 실제로 체감하거나 고려해야 할 차이는 무엇인가?
 
-Do not spend the session on frame formats or transport implementation.
+Frame format이나 transport 구현을 자세히 파고들지는 않습니다.
 
-### 6. Classify failures
+### 6. 실패의 책임 구분하기
 
-Prepare several request failures and ask participants to assign responsibility:
+다음과 같은 실패 사례를 준비하고, 어느 계층에서 책임을 찾아야 할지 분류합니다.
 
-- Name cannot be resolved.
-- The result is stale or points elsewhere.
-- A transport connection cannot be established.
-- Certificate identity validation fails.
-- TLS negotiation fails.
-- A gateway rejects or cannot route the request.
-- The application returns an error.
-- A browser blocks access despite a valid server response.
+- 이름을 해석하지 못합니다.
+- 오래된 응답이나 의도하지 않은 주소를 받습니다.
+- Transport connection을 만들지 못합니다.
+- Certificate identity 검증이 실패합니다.
+- TLS negotiation이 실패합니다.
+- Gateway가 요청을 거부하거나 route를 찾지 못합니다.
+- 애플리케이션이 오류를 반환합니다.
+- 서버 응답은 유효하지만 browser가 접근을 차단합니다.
 
-The goal is a disciplined high-level diagnosis before reaching for lower-level tools.
+Low-level 도구를 사용하기 전에 전체 흐름에서 문제 영역을 좁혀가는 습관을 만드는 것이 목표입니다.
 
-## Scope boundaries
+## 범위
 
-### Keep
+### 반드시 다룰 내용
 
-- One URL-to-response narrative
-- DNS delegation and caching
-- TLS identity, trust chains, SNI, and ALPN
-- HTTP methods, status, headers, idempotency, redirects, and caching
-- Cookies, CORS, and proxy boundaries
-- Motivation-level comparison of HTTP versions
-- Failure ownership
+- URL에서 응답까지 이어지는 하나의 이야기
+- DNS delegation과 캐싱
+- TLS identity, trust chain, SNI, ALPN
+- HTTP method, status, 헤더, idempotency, redirect, 캐싱
+- Cookie, CORS, proxy boundary
+- 등장 배경 중심의 HTTP 버전 비교
+- 장애를 담당 계층별로 구분하는 방법
 
-### Leave out
+### 다루지 않을 내용
 
-- Packet-capture analysis
-- TLS cryptographic primitive details
-- TLS wire-message memorization
-- Detailed HTTP frame formats
+- Packet capture 분석
+- TLS 암호 primitive의 세부 구현
+- TLS wire message 암기
+- HTTP frame format의 세부 구조
 - DNSSEC
-- Exhaustive DNS record coverage
-- Deep HTTP-version benchmarking
+- 모든 DNS record 나열
+- HTTP version별 상세 benchmark
 
-## Starting references
+## 시작 자료
 
 - [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110)
 - [RFC 9111: HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111)
@@ -137,7 +137,7 @@ The goal is a disciplined high-level diagnosis before reaching for lower-level t
 - [MDN: HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP)
 - [MDN: CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 
-## Minimum preparation
+## 최소 준비 사항
 
-- Lead the request-flow and application-semantics discussion.
-- Share the references used.
+- 전체 요청 흐름과 애플리케이션 semantics를 중심으로 세션을 진행합니다.
+- 조사에 사용한 참고 자료를 공유합니다.

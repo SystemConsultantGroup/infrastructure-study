@@ -1,141 +1,141 @@
 # Kubernetes (Part 1)
 
-[Back to the curriculum](../../README.md)
+[전체 커리큘럼으로 돌아가기](../../README.md)
 
-## Profile
+## 기본 정보
 
-- **Audience:** Application developers
-- **Leads:** 3
-- **Duration:** 120 minutes
+- **대상:** 애플리케이션 개발자
+- **담당 인원:** 3명
+- **시간:** 120분
 
-## Purpose
+## 학습 목표
 
-Understand Kubernetes as a declarative system of APIs and reconciling controllers, then use resource identity and ownership to explain how independently operating controllers compose a workload.
+Kubernetes를 선언적 API와 이를 지속적으로 reconcile하는 controller의 집합으로 이해합니다. 이어서 resource identity와 ownership을 바탕으로, 서로 독립적으로 동작하는 controller들이 하나의 workload를 어떻게 구성하는지 설명합니다.
 
-Participants should be able to start with one application declaration and derive the identities and relationships of the resources created to maintain it.
+세션이 끝났을 때 참가자는 하나의 애플리케이션 선언에서 출발해, 이를 유지하기 위해 생성되는 resource의 identity와 소유 관계를 스스로 도출할 수 있어야 합니다.
 
-## Preparation brief
+## 준비 방향
 
-Begin with philosophy and control systems, not a catalogue of resource types. Use one minimally containerized application throughout the session.
+리소스 종류를 나열하기 전에 Kubernetes의 철학과 control system부터 설명합니다. 하나의 간단한 container application을 세션 전체에서 일관되게 사용합니다.
 
-Resource definitions are a central subject: investigate how type, name, UID, namespace, labels, selectors, and owner references establish identity and relationships. Do not reduce the topic to writing YAML.
+Resource definition은 이 차시의 핵심입니다. Type, name, UID, namespace, label, selector, owner reference가 identity와 관계를 어떻게 만드는지 탐구합니다. 단순히 YAML 작성법을 배우는 세션이 되지 않도록 합니다.
 
-## Guiding vectors
+## 탐구 방향
 
-### 1. Establish the Kubernetes philosophy
+### 1. Kubernetes의 철학 이해하기
 
-Investigate:
+다음 질문을 조사합니다.
 
-- Which operational problems led to Kubernetes's design?
-- What is the difference between issuing an action and declaring desired state?
-- What roles do the API server and controllers play in that model?
-- How are desired and observed state represented?
-- What does eventual convergence imply during normal operation and failure?
-- Why are controllers designed to be independently reconciling and retrying?
-- What responsibilities remain with the application developer?
+- Kubernetes는 어떤 운영 문제를 해결하기 위해 설계되었는가?
+- 명령으로 동작을 지시하는 것과 desired state를 선언하는 것은 어떻게 다른가?
+- API server와 controller는 이 모델에서 어떤 역할을 하는가?
+- Desired state와 observed state는 어떻게 표현되는가?
+- 정상 상황과 장애 상황에서 eventual convergence는 무엇을 의미하는가?
+- Controller가 독립적으로 reconcile하고 반복해서 retry하도록 설계된 이유는 무엇인가?
+- 이 모델에서도 애플리케이션 개발자가 책임져야 할 것은 무엇인가?
 
-Relate these questions to the imperative/declarative distinction introduced in the first session.
+Introduction에서 살펴본 imperative/declarative 구분과 연결합니다.
 
-### 2. Introduce the deployment artifact
+### 2. 배포 아티팩트 이해하기
 
-Build one minimal container image and investigate:
+최소한의 container 이미지 하나를 만들고 다음을 조사합니다.
 
-- What exactly is being handed to Kubernetes?
-- Which runtime behavior is inside the artifact, and which is declared to the platform?
-- Which properties should remain stable across environments?
-- What must the application expose so that the platform can manage it correctly?
+- Kubernetes에 전달하는 것은 정확히 무엇인가?
+- 런타임 동작 가운데 이미지 안에 들어가는 것과 platform에 선언하는 것은 각각 무엇인가?
+- 환경이 달라져도 동일하게 유지되어야 하는 속성은 무엇인가?
+- Platform이 애플리케이션을 올바르게 관리하려면 애플리케이션은 어떤 신호와 interface를 제공해야 하는가?
 
-Keep Dockerfile optimization and container-runtime internals outside the core scope.
+Dockerfile 최적화와 container 런타임 내부 구현은 핵심 범위에서 제외합니다.
 
-### 3. Read a Kubernetes resource definition
+### 3. Kubernetes Resource definition 읽기
 
-Use representative resources to investigate:
+대표 resource를 이용해 다음을 살펴봅니다.
 
-- `apiVersion`, `kind`, `metadata`, `spec`, and `status`
-- API group, version, and kind as resource type identity
-- Namespaced and cluster-scoped resources
-- Schema validation and defaulting
-- User-declared intent versus system-reported observation
-- Which fields are stable identity and which are mutable configuration
+- `apiVersion`, `kind`, `metadata`, `spec`, `status`
+- API group, version, kind가 표현하는 resource type
+- Namespaced resource와 cluster-scoped resource
+- Schema validation과 defaulting
+- 사용자가 선언한 의도와 시스템이 보고하는 현재 상태
+- Identity를 이루는 field와 변경 가능한 구성 field의 차이
 
-Ask what a client, API server, and controller each need from the definition.
+Client, API server, controller가 definition에서 각각 어떤 정보를 필요로 하는지 질문합니다.
 
-### 4. Derive object identity
+### 4. Object identity 도출하기
 
-Build a coherent identity model around:
+다음 요소를 하나의 identity model로 연결합니다.
 
-- Resource type, namespace, and name
-- Generated names
-- UIDs and object reincarnation
-- Labels as descriptive identity
-- Selectors as dynamic association
-- Owner references as lifecycle and controller relationships
-- Controller ownership and garbage collection
+- Resource type, namespace, name
+- Generated name
+- UID와 삭제 후 재생성된 object의 구분
+- 설명적 identity로 사용하는 label
+- 동적인 관계를 만드는 selector
+- Lifecycle과 controller 관계를 표현하는 owner reference
+- Controller ownership과 garbage collection
 
-Explore why names alone are insufficient and why labels alone do not express ownership.
+Name만으로 identity를 완전히 표현할 수 없는 이유, label만으로 ownership을 표현할 수 없는 이유를 탐구합니다.
 
-### 5. Follow the controller lineage
+### 5. Controller lineage 따라가기
 
-Starting from one Deployment, derive and inspect:
+하나의 Deployment에서 시작해 다음 관계를 도출하고 확인합니다.
 
-- The Deployment's identity and desired state
-- The ReplicaSet selected or created to realize that state
-- The Pods owned by the ReplicaSet
-- The labels and selectors that connect the chain
-- The Service and the Pods it selects
-- Which names or hashes change during a rollout
-- Which relationships survive deletion and recreation
+- Deployment의 identity와 desired state
+- Desired state를 실현하기 위해 선택되거나 생성되는 ReplicaSet
+- ReplicaSet이 소유하는 Pod
+- 이 관계를 연결하는 label과 selector
+- Service와 그 Service가 선택하는 Pod
+- Rollout 과정에서 바뀌는 name 또는 hash
+- 삭제하고 다시 만들었을 때 유지되는 관계와 달라지는 관계
 
-The group should be able to explain every resulting resource name, UID, owner, label, and selector without treating them as arbitrary YAML.
+생성된 resource의 name, UID, owner, label, selector를 임의로 정해진 YAML 값으로 여기지 않고 그 이유를 설명할 수 있어야 합니다.
 
-### 6. Explore the application contract
+### 6. Application과 platform 사이의 contract 살펴보기
 
-Use the same workload to investigate:
+같은 workload로 다음 내용을 탐구합니다.
 
-- Configuration and secret references
-- Resource requests and limits
+- Configuration과 secret reference
+- 리소스 request와 limit
 - Readiness
 - Graceful termination
-- Replica changes and rollout
+- Replica 변경과 rollout
 
-Ask how each declaration affects controller decisions and what behavior Kubernetes expects from the application.
+각 선언이 controller의 판단에 어떤 영향을 주며, Kubernetes가 애플리케이션에 기대하는 동작은 무엇인지 질문합니다.
 
-### 7. Observe reconciliation
+### 7. Reconciliation 관찰하기
 
-Prepare a small set of changes or failures:
+다음과 같은 변경이나 실패를 준비합니다.
 
-- Delete a managed Pod.
-- Change desired replica count.
-- Change the Pod template.
-- Make readiness fail.
-- Recreate an object with the same name.
+- 관리 중인 Pod를 삭제합니다.
+- 원하는 replica 수를 변경합니다.
+- Pod template을 변경합니다.
+- Readiness를 실패하게 만듭니다.
+- 같은 name으로 object를 다시 만듭니다.
 
-Before observing the result, require a prediction based on identity, ownership, and controller responsibility.
+결과를 확인하기 전에 identity, ownership, 컨트롤러 책임을 근거로 어떤 일이 생길지 먼저 예측합니다.
 
-## Scope boundaries
+## 범위
 
-### Keep
+### 반드시 다룰 내용
 
-- Declarative APIs and control loops
-- Desired state, observed state, and convergence
-- Minimal image build
-- Pod, Deployment, ReplicaSet, and Service relationships
-- Resource definitions and API identity
-- Names, UIDs, labels, selectors, and owner references
-- Configuration, resources, readiness, and shutdown as application contracts
-- Reconciliation experiments
+- Declarative API와 control loop
+- Desired state, observed state, convergence
+- 최소한의 이미지 빌드
+- Pod, Deployment, ReplicaSet, 서비스 관계
+- Resource definition과 API identity
+- Name, UID, label, selector, owner reference
+- Configuration, resource, readiness, shutdown을 application contract로 보는 관점
+- Reconciliation 실험
 
-### Leave out
+### 다루지 않을 내용
 
-- Comparison with virtual machines
-- Container runtime internals
-- Detailed Dockerfile optimization
-- Broad surveys of every workload type
-- Storage and scheduling deep dives
-- Extensive YAML syntax instruction
-- Platform-specific generated naming; that appears in Part 2 and GitOps
+- Virtual machine과의 비교
+- Container 런타임 내부 구조
+- 세부 Dockerfile 최적화
+- 모든 workload 타입 소개
+- Storage와 scheduling 심화
+- 광범위한 YAML 문법 수업
+- Platform이 생성하는 naming 규칙: Part 2와 GitOps에서 다룹니다.
 
-## Starting references
+## 시작 자료
 
 - [Kubernetes Objects](https://kubernetes.io/docs/concepts/overview/working-with-objects/)
 - [Object Names and IDs](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/)
@@ -145,7 +145,7 @@ Before observing the result, require a prediction based on identity, ownership, 
 - [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 - [Services](https://kubernetes.io/docs/concepts/services-networking/service/)
 
-## Minimum preparation
+## 최소 준비 사항
 
-- Lead the philosophical and resource-identity investigation.
-- Share the references used.
+- Kubernetes의 철학과 resource identity를 중심으로 세션을 진행합니다.
+- 조사에 사용한 참고 자료를 공유합니다.

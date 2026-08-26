@@ -1,28 +1,28 @@
 # GitOps
 
-[Back to the curriculum](../../README.md)
+[전체 커리큘럼으로 돌아가기](../../README.md)
 
-## Profile
+## 기본 정보
 
-- **Audience:** Application developers
-- **Leads:** 2
-- **Duration:** 120 minutes
+- **대상:** 애플리케이션 개발자
+- **담당 인원:** 2명
+- **시간:** 120분
 
-## Purpose
+## 학습 목표
 
-Learn how to establish an application repository, connect it to [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes), and reason about the complete managed delivery lifecycle.
+새 애플리케이션 저장소를 만들고 [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)에 연결하는 과정을 익힙니다. 이어서 Managed application이 배포되는 전체 lifecycle을 이해합니다.
 
-Participants should be able to onboard an application through the supported path without needing cluster or platform-operator access.
+세션이 끝났을 때 참가자는 클러스터 또는 플랫폼 운영자 권한 없이도 정해진 절차에 따라 애플리케이션을 onboarding할 수 있어야 합니다.
 
-## Preparation brief
+## 준비 방향
 
-Prepare one managed application happy path. Follow production in full, then explain how testing and pull-request previews differ.
+Managed application의 가장 기본적인 성공 경로 하나를 준비합니다. Production 배포는 처음부터 끝까지 추적하고, testing과 pull-request preview는 production과 달라지는 부분만 설명합니다.
 
-The session should connect two repositories and several systems without becoming an implementation walkthrough of every workflow, ApplicationSet, or Helm template. The philosophical focus is ownership: determine which repository is authoritative for source, build output, deployment intent, and runtime state.
+두 저장소와 여러 시스템을 연결해서 보되, 모든 workflow, ApplicationSet, Helm template의 내부 구현을 분석하는 세션으로 만들지는 않습니다. 핵심 철학은 ownership입니다. Source, build artifact, deployment intent, runtime state에 대한 권한이 각각 어느 저장소와 시스템에 있는지 구분합니다.
 
-## Starting material
+## 시작 자료
 
-Begin with these files in the Kubernetes repository:
+Kubernetes 저장소의 다음 파일부터 살펴봅니다.
 
 - `applications/README.en.md`
 - `applications/example/`
@@ -30,129 +30,129 @@ Begin with these files in the Kubernetes repository:
 - `argocd/application-sets/README.en.md`
 - `argocd/charts/application/README.en.md`
 
-Use the documents to derive the workflow; do not copy their conclusions into the presentation without connecting them to the underlying GitOps model.
+문서에서 workflow를 직접 도출하되, 적힌 내용을 그대로 옮기지 말고 GitOps model과 연결해 설명합니다.
 
-## Guiding vectors
+## 탐구 방향
 
-### 1. Define the two-repository contract
+### 1. 두 저장소 사이의 계약 정의하기
 
-Investigate:
+다음 질문을 조사합니다.
 
-- What belongs in an application repository?
-- What belongs in the Kubernetes repository?
-- Which repository initiates a delivery event?
-- Which repository records deployment intent?
-- Why is runtime state not written back as the primary source of truth?
-- What authorization permits one repository to request a change in the other?
+- Application repository에는 무엇이 있어야 하는가?
+- Kubernetes repository에는 무엇이 있어야 하는가?
+- 어느 저장소가 delivery event를 시작하는가?
+- 어느 저장소가 deployment intent를 기록하는가?
+- 런타임 state를 source of truth로 다시 기록하지 않는 이유는 무엇인가?
+- 한 저장소가 다른 저장소에 변경을 요청할 수 있도록 허용하는 authorization은 무엇인가?
 
-Draw the trust boundary before studying individual workflow steps.
+개별 workflow를 살펴보기 전에 trust boundary부터 그립니다.
 
-### 2. Prepare a minimal application repository
+### 2. 최소 Application repository 준비하기
 
-Build or simulate a small repository and determine:
+작은 예제 저장소를 만들거나 모의 환경을 구성하고 다음을 확인합니다.
 
-- Which application artifact must be buildable?
-- Where must the Dockerfile and build context live?
-- How is the shared workflow referenced and versioned?
-- Which workflow events are relevant?
-- Which permissions and credentials are required?
-- Which data may safely be passed as build input?
-- Which data must never be embedded in the workflow or image?
+- 어떤 application artifact를 build할 수 있어야 하는가?
+- Dockerfile과 build context는 어디에 있어야 하는가?
+- Shared workflow는 어떻게 참조하고 version을 고정하는가?
+- 어떤 workflow event가 배포와 관련되는가?
+- 어떤 권한과 credential이 필요한가?
+- 어떤 값을 build input으로 안전하게 넘길 수 있는가?
+- Workflow 또는 image에 절대 포함하면 안 되는 정보는 무엇인가?
 
-Prefer a disposable example over modifying an existing production application.
+기존 production application을 변경하기보다 일회용 예제를 사용합니다.
 
-### 3. Register the managed application
+### 3. Managed application 등록하기
 
-Investigate the managed layout in the Kubernetes repository:
+Kubernetes 저장소의 managed layout을 살펴보며 다음을 조사합니다.
 
-- Which files establish application and workload intent?
-- Which information belongs in application metadata?
-- Which information belongs in an instance lock?
-- How is the initial production identity established?
-- How are source and image identities connected?
-- Which naming constraints cross repository, Argo CD, namespace, and Kubernetes boundaries?
-- What validation protects the contract?
+- Application과 workload의 intent를 어떤 파일이 정의하는가?
+- Application metadata에는 어떤 정보가 들어가는가?
+- Instance lock에는 어떤 정보가 들어가는가?
+- 최초 production identity는 어떻게 만들어지는가?
+- Source identity와 이미지 identity는 어떻게 연결되는가?
+- 저장소, Argo CD, 네임스페이스, Kubernetes에 걸친 naming 제약은 무엇인가?
+- 이 contract는 어떤 validation으로 보호되는가?
 
-Mention the custom Kustomize layout only as an escape hatch and explain how a developer would know when further study is necessary.
+Custom Kustomize layout은 escape hatch로만 간단히 소개합니다. 어떤 상황에서 추가 조사가 필요한지 판단할 기준을 제시합니다.
 
-### 4. Trace one production delivery
+### 4. Production 배포 하나 추적하기
 
-Follow one production change end to end:
+Production 변경 하나를 처음부터 끝까지 따라갑니다.
 
-1. An application source change occurs.
-2. The application repository runs its delivery workflow.
-3. An immutable build artifact and source identity are produced.
-4. A cross-repository request is authenticated and validated.
-5. Deployment intent changes in the Kubernetes repository.
-6. Argo CD observes the new state.
-7. Application generation and Helm rendering occur.
-8. Kubernetes reconciles the resulting resources.
+1. Application source가 변경됩니다.
+2. Application repository의 delivery workflow가 실행됩니다.
+3. Immutable build artifact와 source identity가 생성됩니다.
+4. 저장소 간 요청이 인증되고 검증됩니다.
+5. Kubernetes repository의 deployment intent가 변경됩니다.
+6. Argo CD가 새로운 상태를 관찰합니다.
+7. 애플리케이션 생성과 Helm rendering이 이루어집니다.
+8. Kubernetes가 생성된 resource를 reconcile합니다.
 
-For every transition, identify the artifact, authority, identity, and possible failure.
+각 전환에서 이동하는 아티팩트, 변경 권한을 가진 주체, identity, 가능한 실패를 식별합니다.
 
-The group should discover exact event mappings and workflow behavior from repository documentation rather than receiving them as curriculum facts.
+정확한 이벤트 mapping과 워크플로 behavior는 커리큘럼에서 정답으로 받는 것이 아니라, 저장소 문서를 통해 준비팀이 직접 찾아야 합니다.
 
-### 5. Compare testing and preview behavior
+### 5. Testing과 preview의 차이 조사하기
 
-After the production flow is clear, investigate:
+Production 흐름을 이해한 뒤 다음을 조사합니다.
 
-- What event identifies a testing deployment?
-- What event identifies a preview?
-- How is preview identity derived?
-- What happens when a preview is updated or closed?
-- Which configuration or services can a preview share?
-- Which security assumptions differ from production?
+- 어떤 event가 testing 배포를 식별하는가?
+- 어떤 event가 preview를 식별하는가?
+- Preview identity는 어떻게 파생되는가?
+- Preview를 갱신하거나 닫으면 어떤 일이 생기는가?
+- Preview는 어떤 configuration 또는 service를 공유할 수 있는가?
+- Production과 다른 security assumption은 무엇인가?
 
-Present only the differences; do not repeat the complete production trace.
+전체 production 흐름을 반복하지 말고 차이만 정리합니다.
 
-### 6. Connect to generation at a high level
+### 6. 리소스 생성 과정과 연결하기
 
-Use the understanding from Kubernetes Part 2 to determine:
+Kubernetes Part 2에서 배운 내용을 이용해 다음을 확인합니다.
 
-- How an application declaration becomes an Argo CD Application.
-- Where shared values and templates enter the flow.
-- Which resources are generated for the example workload.
-- How generated identity remains connected to application identity.
+- 애플리케이션 선언은 어떻게 Argo CD Application이 되는가?
+- Shared values와 template은 어느 지점에 들어오는가?
+- 예제 workload를 위해 어떤 resource가 만들어지는가?
+- 생성된 identity는 애플리케이션 identity와 어떻게 연결되는가?
 
-Do not perform a line-by-line walkthrough of ApplicationSet or chart templates.
+ApplicationSet과 차트 template을 줄마다 분석하지는 않습니다.
 
-### 7. Evaluate the philosophy
+### 7. 설계 철학 평가하기
 
-Conclude with:
+마지막으로 다음 질문을 논의합니다.
 
-- Why immutable source and image identities matter.
-- Why the workflow changes Git rather than the cluster.
-- Why application developers do not need cluster credentials.
-- Which controls constrain untrusted application events.
-- What audit trail exists across the two repositories.
-- Which failure modes the design accepts in exchange for those properties.
+- 불변 source identity와 이미지 identity가 중요한 이유는 무엇인가?
+- Workflow가 cluster를 직접 바꾸지 않고 Git을 변경하는 이유는 무엇인가?
+- 애플리케이션 개발자에게 cluster credential이 필요하지 않은 이유는 무엇인가?
+- 신뢰할 수 없는 application event는 어떤 제약을 받는가?
+- 두 저장소에 걸쳐 어떤 audit trail이 남는가?
+- 이 속성을 얻는 대신 어떤 failure mode를 감수하는가?
 
-## Scope boundaries
+## 범위
 
-### Keep
+### 반드시 다룰 내용
 
-- One managed application onboarding
-- Application repository setup
-- Shared workflow integration
-- Cross-repository authorization and trust
-- Immutable source and image identity
-- Initial registration in the Kubernetes repository
-- Full production lifecycle
-- Testing and preview differences
-- ApplicationSet and Helm generation at overview level
+- Managed application 하나의 onboarding
+- Application repository 구성
+- Shared workflow 연결
+- 저장소 간 authorization과 trust
+- 불변 source 및 이미지 identity
+- Kubernetes 저장소 최초 등록
+- Production lifecycle 전체
+- Testing과 preview의 차이
+- ApplicationSet과 Helm generation의 큰 흐름
 
-### Leave out
+### 다루지 않을 내용
 
-- Detailed custom Kustomize onboarding
-- Reusable workflow implementation internals
-- Shared chart template internals
-- Argo CD platform administration
-- Platform recovery
-- Production credentials or live production modifications
+- Custom Kustomize onboarding 상세
+- Reusable workflow 내부 구현
+- Shared chart template 내부 구현
+- Argo CD 플랫폼 관리
+- 플랫폼 recovery
+- Production 자격 증명 또는 실제 production 변경
 
-## Minimum preparation
+## 최소 준비 사항
 
-- Lead the managed onboarding and lifecycle session.
-- Share the references used.
+- Managed application onboarding과 lifecycle을 중심으로 세션을 진행합니다.
+- 조사에 사용한 참고 자료를 공유합니다.
 
-A disposable example repository or convincing simulation is useful but not mandatory.
+일회용 example repository 또는 충분히 설득력 있는 simulation을 준비하면 좋지만 필수는 아닙니다.
