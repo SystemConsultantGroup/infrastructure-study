@@ -12,7 +12,7 @@ Linux와 네트워크의 기초부터 Kubernetes와 플랫폼 운영까지, 현�
 - Advanced 주제는 플랫폼 엔지니어에게 필요한 관점을 다룹니다.
 - 필수 결과물은 준비한 세션과 공유할 참고 자료뿐입니다. 슬라이드, 다이어그램, 실습, 과제 등을 만들지는 각 팀이 자유롭게 결정합니다.
 - 주제별 문서는 정답을 제공하지 않고, 조사를 시작할 방향과 질문을 제시합니다. 결론은 공식 문서와 직접 수행한 실험을 바탕으로 준비팀이 도출해야 합니다.
-- SCG 환경을 살펴볼 때는 [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes) 저장소를 기준으로 합니다.
+- SCG 환경을 살펴볼 때는 [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes) repository를 기준으로 합니다.
 
 ## 커리큘럼
 
@@ -39,7 +39,7 @@ Linux와 네트워크의 기초부터 Kubernetes와 플랫폼 운영까지, 현�
 3. 어떤 trade-off와 책임 경계를 만드는가?
 4. 문서를 그대로 옮기는 데 그치지 않고, 이해한 내용을 어떻게 검증할 수 있는가?
 
-공식 문서에 적힌 사실, 실험에서 직접 관찰한 결과, 준비팀이 추론한 내용을 명확히 구분해야 합니다. 참고 자료는 공식 문서, 표준 문서, 소스 코드, 그리고 이 스터디에서 직접 다루는 저장소를 우선합니다.
+공식 문서에 적힌 사실, 실험에서 직접 관찰한 결과, 준비팀이 추론한 내용을 명확히 구분해야 합니다. 참고 자료는 공식 문서, 표준 문서, 소스 코드, 그리고 이 스터디에서 직접 다루는 repository를 우선합니다.
 
 ## 개발 환경
 
@@ -49,6 +49,6 @@ Linux와 네트워크의 기초부터 Kubernetes와 플랫폼 운영까지, 현�
 nix develop
 ```
 
-Flake에는 각 차시에서 사용할 수 있는 최소한의 공통 도구가 들어 있습니다. DNS, HTTP/TLS, container, Kubernetes, Cilium, Talos/QEMU, GitHub, YAML, 처리량 측정, 패킷 관찰 도구를 제공하며, Linux에서는 low-level 주제에 필요한 Linux 전용 networking 및 tracing 도구가 추가됩니다.
+Flake에는 각 차시에서 사용할 수 있는 최소한의 공통 도구가 들어 있습니다. DNS, HTTP/TLS, container, Kubernetes, Cilium, Talos/QEMU, GitHub, YAML, throughput 측정, packet observation 도구를 제공하며, Linux에서는 low-level 주제에 필요한 Linux 전용 networking 및 tracing 도구가 추가됩니다.
 
-지원 환경은 x86_64 Linux, aarch64 Linux, aarch64 macOS입니다. macOS 지원은 Flake가 정상적으로 평가되고 환경을 이식할 수 있음을 확인하는 데 주된 목적이 있습니다. 운영체제 기능에 의존하는 실습은 Linux가 필요할 수 있습니다. Flake는 `nixpkgs-unstable` 브랜치를 사용합니다.
+지원 환경은 x86_64 Linux, aarch64 Linux, aarch64 macOS입니다. macOS 지원은 Flake가 정상적으로 평가되고 환경을 이식할 수 있음을 확인하는 데 주된 목적이 있습니다. operating system 기능에 의존하는 실습은 Linux가 필요할 수 있습니다. Flake는 `nixpkgs-unstable` branch를 사용합니다.

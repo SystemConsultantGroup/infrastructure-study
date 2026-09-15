@@ -23,9 +23,9 @@ Helm, Argo CD, Gateway API가 Kubernetes의 선언적 모델을 각각 어떤 �
 ### 공통 흐름
 
 - 애플리케이션 개발자가 직접 관리하는 입력은 무엇인가?
-- 입력은 어떤 단계에서 다른 형태의 리소스로 바뀌는가?
+- 입력은 어떤 단계에서 다른 형태의 resource로 바뀌는가?
 - 일회성 변환과 지속적인 reconciliation은 어떻게 다른가?
-- 배포된 리소스와 실제 요청 처리 사이의 경계는 어디인가?
+- 배포된 resource와 실제 요청 처리 사이의 경계는 어디인가?
 
 ### Helm
 
@@ -43,16 +43,16 @@ Helm, Argo CD, Gateway API가 Kubernetes의 선언적 모델을 각각 어떤 �
 
 ### Gateway API
 
-- Gateway API는 어떤 소유권과 협업 문제를 해결하려 하는가?
+- Gateway API는 어떤 ownership과 협업 문제를 해결하려 하는가?
 - `Gateway`, `Listener`, `Route`, `backendRef`의 관계는 어떻게 표현되는가?
-- 선언한 `Route`가 실제 요청 처리로 이어지려면 어떤 컨트롤러와 상태가 필요한가?
+- 선언한 `Route`가 실제 요청 처리로 이어지려면 어떤 controller와 상태가 필요한가?
 - 라우팅과 TLS 책임은 배포 구조에 따라 어떻게 달라지는가?
 
 ### 세 시스템 연결하기
 
 준비팀은 [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)에서 사례 하나를 골라 Helm, Argo CD, Kubernetes, Gateway API 사이의 흐름을 도출합니다.
 
-각 경계에서 이동하는 선언과 리소스, 식별 정보의 연결, 관찰할 수 있는 실패를 설명합니다. 저장소 구조를 그대로 소개하기보다 각 시스템의 책임이 드러나도록 구성합니다.
+각 경계에서 이동하는 선언과 resource, identifiers의 연결, 관찰할 수 있는 실패를 설명합니다. repository 구조를 그대로 소개하기보다 각 시스템의 책임이 드러나도록 구성합니다.
 
 ## 범위
 
@@ -61,7 +61,7 @@ Helm, Argo CD, Gateway API가 Kubernetes의 선언적 모델을 각각 어떤 �
 - 하나의 애플리케이션으로 연결한 전체 흐름
 - Helm의 패키징과 렌더링 방식
 - Argo CD Application과 reconciliation
-- Gateway API의 소유권과 기본 라우팅 모델
+- Gateway API의 ownership과 기본 라우팅 모델
 - 세 시스템 사이의 책임 및 장애 경계
 
 ### 범위 밖
@@ -70,7 +70,7 @@ Helm, Argo CD, Gateway API가 Kubernetes의 선언적 모델을 각각 어떤 �
 - Argo CD 운영 및 관리 방법
 - Argo CD Project와 플랫폼 전체 reconciliation 구조
 - Gateway API의 고급 필터와 매칭 기능 전반
-- 애플리케이션 저장소 등록 절차
+- 애플리케이션 repository 등록 절차
 
 ## 참고 자료
 
@@ -80,7 +80,7 @@ Helm, Argo CD, Gateway API가 Kubernetes의 선언적 모델을 각각 어떤 �
 - [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/)
 - [SystemConsultantGroup/kubernetes](https://github.com/SystemConsultantGroup/kubernetes)의 애플리케이션 예제, 공통 차트, ApplicationSet, 관련 Route
 
-저장소는 조사의 출발점이며, 준비팀은 실제 생성 흐름을 직접 확인합니다.
+repository는 조사의 출발점이며, 준비팀은 실제 생성 흐름을 직접 확인합니다.
 
 ## 준비 결과
 
