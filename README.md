@@ -18,17 +18,18 @@ Linux와 네트워크의 기초부터 Kubernetes와 플랫폼 운영까지, 현�
 
 각 제목은 해당 차시의 학습 목표와 준비 방향을 담은 상세 문서로 연결됩니다.
 
-| 차시 | 인원 | 제목 |
-| --- | ---: | --- |
-|  | 2명 | [Introduction](topics/introduction/README.md) |
-|  | 2명 | [MAC / IP / TCP](topics/mac-ip-tcp/README.md) |
-|  | 3명 | [Linux Network Stack (Advanced)](topics/linux-network-stack/README.md) |
-|  | 2명 | [HTTP / TLS / DNS](topics/http-tls-dns/README.md) |
-|  | 3명 | [Kubernetes (Part 1)](topics/kubernetes-part-1/README.md) |
-|  | 2명 | [Talos (Advanced)](topics/talos/README.md) |
-|  | 3명 | [Kubernetes (Part 2)](topics/kubernetes-part-2/README.md) |
-|  | 2명 | [GitOps](topics/gitops/README.md) |
-|  | 3명 | [GitOps (Advanced)](topics/gitops-advanced/README.md) |
+| 차시 | 인원 | 제목 | 담당자 |
+| --- | ---: | --- | --- |
+|  | 2명 | [Introduction](topics/introduction/README.md) | 박준성(31기), |
+|  | 2명 | [MAC / IP / TCP](topics/mac-ip-tcp/README.md) | 양호준(31기), 손희창(31기) |
+|  | 3명 | [Linux Network Stack (Advanced)](topics/linux-network-stack/README.md) | 
+|  | 2명 | [HTTP / TLS / DNS](topics/http-tls-dns/README.md) | 이찬형(31기), 최연우 (31기) |
+|  | 2명 | [Docker] | |
+|  | 3명 | [Kubernetes (Part 1)](topics/kubernetes-part-1/README.md) |  김상현(26기), 이현우(27기) |
+|  | 2명 | [Talos (Advanced)](topics/talos/README.md) | |
+|  | 3명 | [Kubernetes (Part 2)](topics/kubernetes-part-2/README.md) | 권승원 (31기), 김상현(26기),  |
+|  | 2명 | [GitOps](topics/gitops/README.md) | 이찬형(31기), 이진우(31기) |
+|  | 3명 | [GitOps (Advanced)](topics/gitops-advanced/README.md) | | 
 
 ## 준비 원칙
 
