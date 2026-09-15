@@ -1,5 +1,5 @@
 {
-  description = "Infrastructure study tools";
+  description = "Infrastructure study environment";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
