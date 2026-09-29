@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+cmd=${1:-help}
+if [[ $cmd == help || $cmd == --help ]]; then
+  cat <<'HELP'
+Usage: ./lab up                Create the isolated A-R-B lab (Mac: start Linux VM first)
+       ./lab pc a|b|r          Enter a PC/router terminal
+       ./lab inspect           Show addresses, routes, neighbours
+       ./lab test              Run repeatable network/TCP checks (no listener must be running)
+       ./lab capture a|b|r-left|r-right
+       ./lab timeout-demo      Temporary TCP drop at R, auto-restored
+       ./lab down              Remove owned namespaces, leave Mac VM running
+       ./lab stop              Remove lab and stop Mac VM
+       ./lab doctor            Report executable availability without setup
+PC commands: lab-help, ping-peer, routes, neighbors, hops, sniff, listen, send
+Two Nix shells alone are NOT two PCs: ./lab pc a and ./lab pc b enter separate Linux network namespaces.
+HELP
+  exit 0
+fi
+if [[ $cmd == doctor ]]; then
+  echo "Host: $(uname -sm)"
+  for tool in nix node qemu-system-aarch64 qemu-img mkisofs ssh ip ping tcpdump traceroute; do
+    if command -v "$tool" >/dev/null 2>&1; then printf '%s: %s\n' "$tool" "$(command -v "$tool")"; else printf '%s: unavailable in this PATH\n' "$tool"; fi
+  done
+  echo 'macOS needs QEMU Linux VM; Linux needs sudo/CAP_NET_ADMIN and network namespaces.'
+  exit 0
+fi
+shift
+if [[ $(uname -s) == Darwin ]]; then
+  case $cmd in
+    up) bash "$BASE/vm.sh" up; exec bash "$BASE/vm.sh" exec up "$@" ;;
+    pc) exec bash "$BASE/vm.sh" shell "${1:?choose a, b, or r}" ;;
+    stop) bash "$BASE/vm.sh" exec down || true; exec bash "$BASE/vm.sh" stop ;;
+    *) exec bash "$BASE/vm.sh" exec "$cmd" "$@" ;;
+  esac
+elif [[ $(uname -s) == Linux ]]; then
+  case $cmd in pc) cmd=shell ;; stop) cmd=down ;; esac
+  if [[ $EUID == 0 ]]; then exec bash "$BASE/network.sh" "$cmd" "$@"; fi
+  exec sudo env "PATH=$PATH" bash "$BASE/network.sh" "$cmd" "$@"
+else
+  echo 'Supported hosts: Linux or Apple Silicon macOS with QEMU.' >&2
+  exit 2
+fi
