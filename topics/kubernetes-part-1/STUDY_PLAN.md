@@ -26,6 +26,8 @@ A는 합의한 workload skeleton을 사용해 Pod 교체와 Service 실습을 �
 
 팀별 메시지와 revision, Pod 이름을 보여 주는 작은 stateless HTTP 서버를 사용합니다. 참가자는 먼저 제공된 기본 응답을 확인하고, 이후 workload 파일의 설정을 수정해 각 조의 메시지를 배포합니다.
 
+**Stateless가 이번 Deployment 실습의 전제입니다.** 다음 요청을 처리하는 데 필요한 사용자·업무 상태를 특정 Pod의 메모리나 로컬 파일에만 보관하지 않아, 어느 Ready Pod가 요청을 받아도 처리를 이어 갈 수 있도록 합니다. 상태가 전혀 없다는 뜻은 아닙니다. 실제 서비스의 세션·업로드 등 지속할 상태는 DB나 외부 저장소 등에 별도로 보관할 수 있으며, 이 실습에서는 그런 의존성을 만들지 않습니다. Pod 이름과 readiness 표시 파일은 관찰용 임시 상태로, 교체 후 보존할 데이터가 아닙니다.
+
 | 항목 | 준비할 내용 |
 | --- | --- |
 | 리소스 | 조별 namespace, Deployment `team-server`, Service `team-server` |
@@ -89,6 +91,7 @@ A가 전반부를, B가 후반부를 연속해서 진행하고 휴식 시간에 
 
 - **Pod:** 하나 이상의 컨테이너를 함께 실행하는 기본 단위입니다. **ReplicaSet:** 지정된 Pod 수를 유지하며, 일반적으로 이 실습에서는 Deployment가 만듭니다. ReplicaSet 자체를 깊이 다루기보다 Pod와 Deployment를 잇는 역할에 집중합니다.
 - **Deployment:** 원하는 Pod template과 replica 수를 선언하고 ReplicaSet을 관리하며 업데이트를 진행합니다. ReplicaSet은 주로 개수를 유지하고 Deployment는 template 변경 시 새 ReplicaSet을 이용해 롤아웃합니다.
+- **왜 stateless인가:** Deployment는 Pod를 늘리거나 교체하지만 기존 Pod의 메모리·로컬 데이터를 새 Pod로 옮겨 주지 않습니다. 실습 서버는 특정 Pod에 지속할 상태를 맡기지 않으므로 Pod가 바뀌어도 같은 역할을 수행합니다. “로그인 세션이나 업로드 파일을 Pod 안에만 두었다면?”을 질문해 복제 시 상태 불일치와 교체 시 유실을 예상합니다. Deployment가 앱을 자동으로 stateless로 만드는 것은 아닙니다. StatefulSet은 별도의 식별·저장 요구를 위한 선택지가 있다는 정도만 언급합니다.
 - 방금 적용한 파일의 `apiVersion`, `kind`, `metadata`, `spec`과 조회한 `status`를 연결합니다. API 서버·controller의 역할, 원하는 상태와 관찰된 상태, 수렴, namespace/name과 UID를 간단히 소개합니다.
 - 이름이 같아도 삭제 후 새로 생성한 오브젝트는 UID가 다릅니다. Label은 이름이나 UID처럼 특정 인스턴스를 식별하는 값이 아니라 selector로 집합을 찾기 위한 속성입니다. 뒤에서 Service selector와 비교합니다.
 - Deployment → ReplicaSet → Pod의 `ownerReferences`를 Headlamp와 `kubectl`에서 확인합니다. Pod 이름·UID와 소유자를 기록하고 삭제 결과를 예상한 뒤 삭제합니다. 새 Pod의 UID와 복구된 replica 수를 비교합니다. ReplicaSet controller가 대체 Pod를 만듭니다.
@@ -113,6 +116,7 @@ A가 전반부를, B가 후반부를 연속해서 진행하고 휴식 시간에 
 - A가 관찰한 Pod 교체를 이어 받아 Deployment controller는 ReplicaSet을, ReplicaSet controller는 Pod 수를 조정한다는 책임 경계를 설명합니다. 각 controller는 자신의 대상과 원하는 상태를 감시하고 독립적으로 동작합니다.
 - `ownerReferences`로 관리 관계를 확인하고 selector가 겹치는 controller가 같은 Pod를 두고 충돌할 수 있음을 설명합니다. 서로 다른 workload의 selector를 겹치지 않게 구성하고, Deployment가 관리하는 ReplicaSet의 replica 수를 별도 자동화가 계속 바꾸지 않도록 책임을 구분합니다. 이 충돌은 설명 사례로만 다룹니다.
 - 선언된 수가 원하는 상태이고 실제 상태가 따라오는 데 시간이 걸리거나 실패할 수 있음을 설명합니다. 발표자가 기존 workload 파일의 replicas를 1에서 2로 변경해 재적용하고 desired/ready 수를 비교합니다. 참가자는 변화를 보고 이유를 설명합니다. 시연은 1개로 되돌립니다.
+- replica가 늘어도 사용자 상태가 복제되는 것은 아님을 짚습니다. 앞선 Pod 교체와 이번 증설을 stateless 설계의 필요성으로 연결하고, “Pod별 메모리에만 세션을 저장하면 다른 Pod가 다음 요청을 받았을 때 어떻게 될까요?”를 짧게 묻습니다.
 
 ### 68–78분 · B · 기존 파일 업데이트와 수렴 실패 관찰
 
@@ -132,6 +136,7 @@ A가 전반부를, B가 후반부를 연속해서 진행하고 휴식 시간에 
 
 - 이미지와 실행 설정, requests/limits, SIGTERM과 graceful shutdown을 설명합니다. 실제 skeleton에서 관련 필드를 찾고, 실습에서 확인한 사실과 설명만 하는 동작을 구분합니다.
 - 이미지는 실행 코드와 기본 실행 환경을 담고, 선언은 이미지 참조와 환경별 설정·자원·probe 등을 지정합니다. Scheduler는 requests를 고려해 배치하며 readiness는 요청을 받을 준비의 신호입니다. 앱은 올바른 신호와 종료 처리를 구현해야 하며 Kubernetes가 비즈니스 로직의 정합성을 대신 보장하지 않습니다.
+- 특정 Pod에 종속되지 않는 요청 처리와 필요한 상태의 영속화·공유는 앱 설계의 책임입니다. Kubernetes Service는 트래픽 대상을 연결할 뿐 세션이나 파일을 동기화하지 않으며, StatefulSet도 데이터 복제·백업을 자동으로 해결하는 것은 아닙니다. 저장소 구성 실습은 추가하지 않습니다.
 - 참가자는 기존 workload 파일의 메시지나 revision을 다시 바꾸어 배포하고 replicas 2개와 Service 응답을 확인합니다. 종료 동작 실험은 선택 사항입니다.
 
 ### 106–115분 · 공동(B 주도) · 내부 클러스터로 연결
@@ -206,6 +211,7 @@ kubectl --context "$INTERNAL_CONTEXT" -n "$INTERNAL_NAMESPACE" \
 **마무리 질문:**
 
 1. Pod, ReplicaSet, Deployment는 각각 무엇을 책임지나요?
+   Deployment로 Pod를 늘리거나 교체할 때 stateless 설계가 왜 중요하며, Pod 안에만 둔 세션·파일은 어떻게 될까요?
 2. Pod를 삭제했을 때 새 UID가 생긴 이유는 무엇이며 누가 대체 Pod를 만들었나요?
 3. Pod가 Running이어도 Service 요청이 실패할 수 있는 이유는 무엇인가요?
 4. Readiness가 실패하면 요청 대상과 프로세스는 각각 어떻게 되나요?
