@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: team-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: team-server
+  template:
+    metadata:
+      labels:
+        app: team-server
+    spec:
+      containers:
+        - name: server
+          image: team-server:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVER_ROLE
+              value: frontend
+            - name: BACKEND_URL
+              value: http://team-backend
+            - name: MESSAGE
+              value: Hello, Kubernetes!
+            - name: REVISION
+              value: v1
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi

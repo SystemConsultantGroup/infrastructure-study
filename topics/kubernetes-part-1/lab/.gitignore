@@ -1,0 +1,3 @@
+.kubeconfig.local
+__pycache__/
+.check-state/
