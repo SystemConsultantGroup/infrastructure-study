@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: team-server
+spec:
+  replicas: 1
+  # ...
+  template:
+    metadata:
+      labels:
+        app: my-server
+    spec:
+      containers:
+        - name: http-server
+          # ...
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVER_ROLE
+              value: frontend
+            - name: BACKEND_URL
+              value: http://wrong-backend
+            - name: MESSAGE
+              value: Hello, Kubernetes!
+            - name: REVISION
+              value: v1
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
